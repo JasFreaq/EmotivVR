@@ -14,16 +14,16 @@ namespace EmotivUnityPlugin
         static readonly object _locker = new object();
         private CortexClient _ctxClient = CortexClient.Instance;
 
-        private Authorizer _authorizer          = Authorizer.Instance;
-        private SessionHandler _sessionHandler  = SessionHandler.Instance;
-        
+        private Authorizer _authorizer = Authorizer.Instance;
+        private SessionHandler _sessionHandler = SessionHandler.Instance;
+
 
         // event
         public event EventHandler<List<string>> QueryProfileOK;
         public event EventHandler<string> ProfileLoaded;
         public event EventHandler<bool> ProfileUnLoaded;
         public event EventHandler<bool> TrainingSucceeded;
-        public event EventHandler<bool> ReadyForTraning;
+        public event EventHandler<bool> ReadyForTraining;
 
         public event EventHandler<string> ProfileSavedOK
         {
@@ -49,6 +49,30 @@ namespace EmotivUnityPlugin
             remove { _ctxClient.GetCurrentProfileDone -= value; }
         }
 
+        public event EventHandler<JObject> GetTrainedSignatureActions
+        {
+            add { _ctxClient.GetTrainedSignatureActions += value; }
+            remove { _ctxClient.GetTrainedSignatureActions -= value; }
+        }
+        
+        public event EventHandler<JObject> GetMentalCommandActiveAction
+        {
+            add { _ctxClient.GetMentalCommandActiveAction += value; }
+            remove { _ctxClient.GetMentalCommandActiveAction -= value; }
+        }
+        
+        public event EventHandler<JObject> GetMentalCommandBrainMap
+        {
+            add { _ctxClient.GetMentalCommandBrainMap += value; }
+            remove { _ctxClient.GetMentalCommandBrainMap -= value; }
+        }
+        
+        public event EventHandler<JArray> GetMentalCommandTrainingThreshold
+        {
+            add { _ctxClient.GetMentalCommandTrainingThreshold += value; }
+            remove { _ctxClient.GetMentalCommandTrainingThreshold -= value; }
+        }
+
         public event EventHandler<DetectionInfo> GetDetectionInfoOK;
 
         public static TrainingHandler Instance { get; } = new TrainingHandler();
@@ -58,9 +82,9 @@ namespace EmotivUnityPlugin
         {
             // Event register
             _ctxClient.GetDetectionInfoDone += OnGetDetectionOk;
-            _ctxClient.LoadProfileOK        += OnProfileLoadedOK;
-            _ctxClient.UnloadProfileDone    += OnUnloadProfileDone;
-            _ctxClient.QueryProfileOK       += OnQueryProfileOK;
+            _ctxClient.LoadProfileOK += OnProfileLoadedOK;
+            _ctxClient.UnloadProfileDone += OnUnloadProfileDone;
+            _ctxClient.QueryProfileOK += OnQueryProfileOK;
         }
 
         private void OnUnloadProfileDone(object sender, bool isSuccess)
@@ -91,26 +115,30 @@ namespace EmotivUnityPlugin
             DetectionInfo detectioninfo = new DetectionInfo("mentalCommand");
 
             JArray actions = (JArray)data["actions"];
-            foreach (var ele in actions) {
+            foreach (var ele in actions)
+            {
                 detectioninfo.Actions.Add(ele.ToString());
             }
             JArray controls = (JArray)data["controls"];
-            foreach (var ele in actions) {
+            foreach (var ele in actions)
+            {
                 detectioninfo.Controls.Add(ele.ToString());
             }
             JArray events = (JArray)data["events"];
-            foreach (var ele in actions) {
+            foreach (var ele in actions)
+            {
                 detectioninfo.Events.Add(ele.ToString());
             }
             JArray signature = (JArray)data["signature"];
-            foreach (var ele in actions) {
+            foreach (var ele in actions)
+            {
                 detectioninfo.Signature.Add(ele.ToString());
             }
             GetDetectionInfoOK(this, detectioninfo);
         }
 
         /// <summary>
-        /// Clear.
+        /// Clear
         /// </summary>
         public void Clear()
         {
@@ -123,7 +151,7 @@ namespace EmotivUnityPlugin
             string cortexToken = _authorizer.CortexToken;
             _ctxClient.QueryProfile(cortexToken);
         }
-        
+
         /// <summary>
         /// Get useful detection information.
         /// </summary>
@@ -145,20 +173,20 @@ namespace EmotivUnityPlugin
         {
             UnityEngine.Debug.Log(status + " " + action + " training.");
             //Do training
-            string cortexToken  = _authorizer.CortexToken;
-            string sessionId    = _sessionHandler.SessionId;
+            string cortexToken = _authorizer.CortexToken;
+            string sessionId = _sessionHandler.SessionId;
             _ctxClient.Training(cortexToken, sessionId, status, detection, action);
         }
 
         public void CreateProfile(string profileName, string headsetId)
         {
-            string cortexToken  = _authorizer.CortexToken;
+            string cortexToken = _authorizer.CortexToken;
             _ctxClient.SetupProfile(cortexToken, profileName, "create", headsetId);
         }
 
         public void LoadProfile(string profileName, string headsetId)
         {
-            
+
             string cortexToken = _authorizer.CortexToken;
             _ctxClient.SetupProfile(cortexToken, profileName, "load", headsetId);
         }

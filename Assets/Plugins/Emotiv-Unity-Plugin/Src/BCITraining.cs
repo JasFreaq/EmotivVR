@@ -10,10 +10,10 @@ namespace EmotivUnityPlugin
     public class BCITraining
     {
         static readonly object _locker = new object();
-        
+
         private static string CurrDetection = "mentalCommand";
 
-        private TrainingHandler _trainingHandler    = TrainingHandler.Instance;
+        private TrainingHandler _trainingHandler = TrainingHandler.Instance;
 
         private string _wantedProfileName = "";
 
@@ -31,12 +31,10 @@ namespace EmotivUnityPlugin
 
         public List<string> ProfileLists { get => _profileLists; set => _profileLists = value; }
 
-
-        public BCITraining()
-        {
-        }
+        public BCITraining() { }
 
         public static BCITraining Instance { get; } = new BCITraining();
+
         public string WantedProfileName { get => _wantedProfileName; set => _wantedProfileName = value; }
 
         /// <summary>
@@ -44,15 +42,18 @@ namespace EmotivUnityPlugin
         /// </summary>
         public void Init()
         {
-            _trainingHandler.QueryProfileOK     += OnQueryProfileOK;
-            _trainingHandler.CreateProfileOK    += OnCreateProfileOK;
-            _trainingHandler.ProfileSavedOK     += OnProfileSavedOK;
-            _trainingHandler.TrainingOK         += OnTrainingOK;
+            _trainingHandler.QueryProfileOK += OnQueryProfileOK;
+            _trainingHandler.CreateProfileOK += OnCreateProfileOK;
+            _trainingHandler.ProfileSavedOK += OnProfileSavedOK;
+            _trainingHandler.TrainingOK += OnTrainingOK;
+            _trainingHandler.GetTrainedSignatureActions += OnGetTrainedSignatureActions;
+            _trainingHandler.GetMentalCommandActiveAction += OnGetMentalCommandActiveAction;
+            _trainingHandler.GetMentalCommandBrainMap += OnGetMentalCommandBrainMap;
+            _trainingHandler.GetMentalCommandTrainingThreshold += OnGetMentalCommandTrainingThreshold;
             _trainingHandler.GetDetectionInfoOK += OnGetDetectionInfoOK;
-            _trainingHandler.ProfileLoaded      += OnProfileLoaded;
+            _trainingHandler.ProfileLoaded += OnProfileLoaded;
             _trainingHandler.ProfileUnLoaded += OnProfileUnLoaded;
             _trainingHandler.GetCurrentProfileDone += OnGetCurrentProfileDone;
-
         }
 
         /// <summary>
@@ -133,7 +134,7 @@ namespace EmotivUnityPlugin
             {
                 _trainingHandler.DoTraining(_currAction, "accept", detection);
             }
-            
+
         }
 
         /// <summary>
@@ -167,7 +168,7 @@ namespace EmotivUnityPlugin
             _trainingHandler.DoTraining(action, "reset", detection);
         }
 
-        // Event handers
+        // Event handlers
         private void OnProfileUnLoaded(object sender, bool e)
         {
             UnityEngine.Debug.Log("OnProfileUnLoaded");
@@ -176,6 +177,7 @@ namespace EmotivUnityPlugin
             _wantedProfileName = "";
             InformLoadUnLoadProfileDone(this, false);
         }
+
         private void OnGetCurrentProfileDone(object sender, JObject data)
         {
             if (data["name"].Type == JTokenType.Null)
@@ -204,6 +206,7 @@ namespace EmotivUnityPlugin
                 }
             }
         }
+
         private void OnProfileLoaded(object sender, string profileName)
         {
             UnityEngine.Debug.Log("BCITraining: OnProfileLoaded profile " + profileName);
@@ -217,6 +220,7 @@ namespace EmotivUnityPlugin
                 UnityEngine.Debug.LogError("OnProfileLoaded: mismatch profilename");
             }
         }
+
         private void OnGetDetectionInfoOK(object sender, DetectionInfo detectionInfo)
         {
             UnityEngine.Debug.Log("OnGetDetectionInfoOK: " + detectionInfo.DetectionName);
@@ -226,6 +230,7 @@ namespace EmotivUnityPlugin
         {
             UnityEngine.Debug.Log("OnTrainingOK: " + result);
         }
+
         private void OnCreateProfileOK(object sender, string profileName)
         {
             UnityEngine.Debug.Log("BCITraining: OnCreateProfileOK profilename " + profileName);
@@ -238,8 +243,6 @@ namespace EmotivUnityPlugin
             {
                 UnityEngine.Debug.LogError("BCITraining: OnCreateProfileOK: mismatch profilename ");
             }
-
-
         }
 
         private void OnQueryProfileOK(object sender, List<string> profiles)
@@ -262,7 +265,7 @@ namespace EmotivUnityPlugin
                 }
                 bool foundProfile = false;
 
-                UnityEngine.Debug.Log("OnQueryProfileOK: number of profiles " +_profileLists.Count.ToString());
+                UnityEngine.Debug.Log("OnQueryProfileOK: number of profiles " + _profileLists.Count.ToString());
 
                 foreach (var profileName in _profileLists)
                 {
@@ -288,5 +291,24 @@ namespace EmotivUnityPlugin
             UnityEngine.Debug.Log("The profile " + profileName + " is saved successfully.");
         }
 
+        private void OnGetTrainedSignatureActions(object sender, JObject result)
+        {
+            UnityEngine.Debug.Log("OnGetTrainedSignatureActions: " + result);
+        }
+        
+        private void OnGetMentalCommandActiveAction(object sender, JObject result)
+        {
+            UnityEngine.Debug.Log("OnGetMentalCommandActiveAction: " + result);
+        }
+        
+        private void OnGetMentalCommandBrainMap(object sender, JObject result)
+        {
+            UnityEngine.Debug.Log("OnGetMentalCommandBrainMap: " + result);
+        }
+        
+        private void OnGetMentalCommandTrainingThreshold(object sender, JArray result)
+        {
+            UnityEngine.Debug.Log("OnGetMentalCommandTrainingThreshold: " + result);
+        }
     }
 }

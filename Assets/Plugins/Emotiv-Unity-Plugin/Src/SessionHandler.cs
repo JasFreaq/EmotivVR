@@ -13,7 +13,7 @@ namespace EmotivUnityPlugin
         private CortexClient _ctxClient = CortexClient.Instance;
 
         //event
-        public event EventHandler<SessionEventArgs> SessionActived;
+        public event EventHandler<SessionEventArgs> SessionActivated;
         public event EventHandler<string> SessionClosedOK;
         public event EventHandler<Record> CreateRecordOK;
         public event EventHandler<Record> StopRecordOK;
@@ -84,7 +84,7 @@ namespace EmotivUnityPlugin
 
             if (sessionInfo.Status == SessionStatus.Activated) {
                 UnityEngine.Debug.Log("Session " + sessionInfo.SessionId + " is activated successfully.");
-                SessionActived(this, sessionInfo);
+                SessionActivated(this, sessionInfo);
             }
             else {
                 UnityEngine.Debug.Log("Session " + sessionInfo.SessionId + " is opened successfully.");
@@ -103,7 +103,7 @@ namespace EmotivUnityPlugin
             else if (sessionInfo.Status == SessionStatus.Activated)
             {
                 lock(_locker) _sessionId = sessionInfo.SessionId;
-                SessionActived(this, sessionInfo);
+                SessionActivated(this, sessionInfo);
             }
         }
 

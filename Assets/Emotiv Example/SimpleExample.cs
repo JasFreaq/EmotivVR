@@ -8,22 +8,22 @@ using UnityEngine.UI;
 public class SimpleExample : MonoBehaviour
 {
     [SerializeField] private ApplicationConfiguration m_appConfig;
-    
+
     EmotivUnityItf _eItf = EmotivUnityItf.Instance;
     float _timerDataUpdate = 0;
     const float TIME_UPDATE_DATA = 1f;
     bool _isDataBufferUsing = false; // default subscribed data will not saved to Data buffer
 
 
-    [SerializeField] public InputField  HeadsetId;   // headsetId
-    [SerializeField] public InputField  RecordTitle;     // record Title
-    [SerializeField] public InputField  RecordDescription;     // record description
-    [SerializeField] public InputField  ProfileName;   // headsetId
+    [SerializeField] public InputField HeadsetId;   // headsetId
+    [SerializeField] public InputField RecordTitle;     // record Title
+    [SerializeField] public InputField RecordDescription;     // record description
+    [SerializeField] public InputField ProfileName;   // headsetId
 
     [SerializeField] public Dropdown ActionNameList;
 
-    [SerializeField] public InputField  MarkerValue;     // marker value
-    [SerializeField] public InputField  MarkerLabel;     // marker Label
+    [SerializeField] public InputField MarkerValue;     // marker value
+    [SerializeField] public InputField MarkerLabel;     // marker Label
     [SerializeField] public Toggle EEGToggle;
     [SerializeField] public Toggle MOTToggle;
     [SerializeField] public Toggle PMToggle;
@@ -35,8 +35,8 @@ public class SimpleExample : MonoBehaviour
     [SerializeField] public Toggle SYSToggle;
 
     [SerializeField] public Text MessageLog;
-    
-    
+
+
     void Start()
     {
         // init EmotivUnityItf without data buffer using
@@ -51,15 +51,17 @@ public class SimpleExample : MonoBehaviour
     void Update()
     {
         _timerDataUpdate += Time.deltaTime;
-        if (_timerDataUpdate < TIME_UPDATE_DATA) 
+        if (_timerDataUpdate < TIME_UPDATE_DATA)
             return;
         _timerDataUpdate -= TIME_UPDATE_DATA;
 
-        if ( _eItf.MessageLog.Contains("Get Error:")) {
+        if (_eItf.MessageLog.Contains("Get Error:"))
+        {
             // show error in red color
             MessageLog.color = Color.red;
         }
-        else {
+        else
+        {
             // update message log
             MessageLog.color = Color.black;
         }
@@ -72,19 +74,22 @@ public class SimpleExample : MonoBehaviour
 
         // If save data to Data buffer. You can do the same EEG to get other data streams
         // Otherwise check output data at OnEEGDataReceived(), OnMotionDataReceived() ..etc..
-        if (_isDataBufferUsing) {
+        if (_isDataBufferUsing)
+        {
             // get eeg data
-            if (_eItf.GetNumberEEGSamples() > 0) {
+            if (_eItf.GetNumberEEGSamples() > 0)
+            {
                 string eegHeaderStr = "EEG Header: ";
-                string eegDataStr   = "EEG Data: ";
-                foreach (var ele in _eItf.GetEEGChannels()) {
-                    string chanStr  = ChannelStringList.ChannelToString(ele);
-                    double[] data     = _eItf.GetEEGData(ele);
-                    eegHeaderStr    += chanStr + ", ";
+                string eegDataStr = "EEG Data: ";
+                foreach (var ele in _eItf.GetEEGChannels())
+                {
+                    string chanStr = ChannelStringList.ChannelToString(ele);
+                    double[] data = _eItf.GetEEGData(ele);
+                    eegHeaderStr += chanStr + ", ";
                     if (data != null && data.Length > 0)
-                        eegDataStr      +=  data[0].ToString() + ", ";
+                        eegDataStr += data[0].ToString() + ", ";
                     else
-                        eegDataStr      +=  "null, "; // for null value
+                        eegDataStr += "null, "; // for null value
                 }
                 string msgLog = eegHeaderStr + "\n" + eegDataStr;
                 MessageLog.text = msgLog;
@@ -96,7 +101,8 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// create session 
     /// </summary>
-    public void onCreateSessionBtnClick() {
+    public void onCreateSessionBtnClick()
+    {
         Debug.Log("onCreateSessionBtnClick");
         if (!_eItf.IsSessionCreated)
         {
@@ -111,13 +117,15 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// start a record 
     /// </summary>
-    public void onStartRecordBtnClick() {
+    public void onStartRecordBtnClick()
+    {
         Debug.Log("onStartRecordBtnClick " + RecordTitle.text + ":" + RecordDescription.text);
         if (_eItf.IsSessionCreated && !string.IsNullOrEmpty(RecordTitle.text))
         {
             _eItf.StartRecord(RecordTitle.text, RecordDescription.text);
         }
-        else {
+        else
+        {
             UnityEngine.Debug.LogError("Can not start a record because there is no active session or record title is empty.");
         }
     }
@@ -125,7 +133,8 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// start a record 
     /// </summary>
-    public void onStopRecordBtnClick() {
+    public void onStopRecordBtnClick()
+    {
         Debug.Log("onStopRecordBtnClick");
         _eItf.StopRecord();
     }
@@ -133,7 +142,8 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// inject marker
     /// </summary>
-    public void onInjectMarkerBtnClick() {
+    public void onInjectMarkerBtnClick()
+    {
         Debug.Log("onInjectMarkerBtnClick " + MarkerValue.text + ":" + MarkerLabel.text);
         _eItf.InjectMarker(MarkerLabel.text, MarkerLabel.text);
     }
@@ -141,14 +151,17 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// subscribe data stream
     /// </summary>
-    public void onSubscribeBtnClick() {
+    public void onSubscribeBtnClick()
+    {
         Debug.Log("onSubscribeBtnClick: " + _eItf.IsSessionCreated + ": " + GetStreamsList().Count);
         if (_eItf.IsSessionCreated)
         {
-            if (GetStreamsList().Count == 0) {
+            if (GetStreamsList().Count == 0)
+            {
                 UnityEngine.Debug.LogError("The stream name is empty. Please set a valid stream name before subscribing.");
             }
-            else {
+            else
+            {
                 _eItf.DataSubLog = ""; // clear data subscribing log
                 _eItf.SubscribeData(GetStreamsList());
             }
@@ -162,12 +175,15 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// un-subscribe data
     /// </summary>
-    public void onUnsubscribeBtnClick() {
+    public void onUnsubscribeBtnClick()
+    {
         Debug.Log("onUnsubscribeBtnClick");
-        if (GetStreamsList().Count == 0) {
+        if (GetStreamsList().Count == 0)
+        {
             UnityEngine.Debug.LogError("The stream name is empty. Please set a valid stream name before unsubscribing.");
         }
-        else {
+        else
+        {
             _eItf.DataSubLog = ""; // clear data subscribing log
             _eItf.UnSubscribeData(GetStreamsList());
         }
@@ -176,7 +192,8 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// load an exited profile or create a new profile then load the profile
     /// </summary>
-    public void onLoadProfileBtnClick() {
+    public void onLoadProfileBtnClick()
+    {
         Debug.Log("onLoadProfileBtnClick " + ProfileName.text);
         _eItf.LoadProfile(ProfileName.text);
     }
@@ -184,7 +201,8 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// unload a profile
     /// </summary>
-    public void onUnLoadProfileBtnClick() {
+    public void onUnLoadProfileBtnClick()
+    {
         Debug.Log("onUnLoadProfileBtnClick " + ProfileName.text);
         _eItf.UnLoadProfile(ProfileName.text);
     }
@@ -192,7 +210,8 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// save a profile
     /// </summary>
-    public void onSaveProfileBtnClick() {
+    public void onSaveProfileBtnClick()
+    {
         Debug.Log("onSaveProfileBtnClick " + ProfileName.text);
         _eItf.SaveProfile(ProfileName.text);
     }
@@ -200,7 +219,8 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// start a mental command training action
     /// </summary>
-    public void onStartMCTrainingBtnClick() {
+    public void onStartMCTrainingBtnClick()
+    {
         if (_eItf.IsProfileLoaded)
             _eItf.StartMCTraining(ActionNameList.captionText.text);
         else
@@ -210,7 +230,8 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// accept a mental command training
     /// </summary>
-    public void onAcceptMCTrainingBtnClick() {
+    public void onAcceptMCTrainingBtnClick()
+    {
         if (_eItf.IsProfileLoaded)
             _eItf.AcceptMCTraining();
         else
@@ -220,7 +241,8 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// reject a mental command training
     /// </summary>
-    public void onRejectMCTrainingBtnClick() {
+    public void onRejectMCTrainingBtnClick()
+    {
         if (_eItf.IsProfileLoaded)
             _eItf.RejectMCTraining();
         else
@@ -230,7 +252,8 @@ public class SimpleExample : MonoBehaviour
     /// <summary>
     /// erase a mental command training
     /// </summary>
-    public void onEraseMCTrainingBtnClick() {
+    public void onEraseMCTrainingBtnClick()
+    {
         Debug.Log("onEraseMCTrainingBtnClick " + ActionNameList.captionText.text);
         if (_eItf.IsProfileLoaded)
             _eItf.EraseMCTraining(ActionNameList.captionText.text);
@@ -287,33 +310,43 @@ public class SimpleExample : MonoBehaviour
         injectMarkerBtn.interactable = _eItf.IsRecording;
     }
 
-    private List<string> GetStreamsList() {
-        List<string> _streams = new List<string> {};
-        if (EEGToggle.isOn) {
+    private List<string> GetStreamsList()
+    {
+        List<string> _streams = new List<string> { };
+        if (EEGToggle.isOn)
+        {
             _streams.Add("eeg");
         }
-        if (MOTToggle.isOn) {
+        if (MOTToggle.isOn)
+        {
             _streams.Add("mot");
         }
-        if (PMToggle.isOn) {
+        if (PMToggle.isOn)
+        {
             _streams.Add("met");
         }
-        if (CQToggle.isOn) {
+        if (CQToggle.isOn)
+        {
             _streams.Add("dev");
         }
-        if (SYSToggle.isOn) {
+        if (SYSToggle.isOn)
+        {
             _streams.Add("sys");
         }
-        if (EQToggle.isOn) {
+        if (EQToggle.isOn)
+        {
             _streams.Add("eq");
         }
-        if (POWToggle.isOn) {
+        if (POWToggle.isOn)
+        {
             _streams.Add("pow");
         }
-        if (FEToggle.isOn) {
+        if (FEToggle.isOn)
+        {
             _streams.Add("fac");
         }
-        if (COMToggle.isOn) {
+        if (COMToggle.isOn)
+        {
             _streams.Add("com");
         }
         return _streams;

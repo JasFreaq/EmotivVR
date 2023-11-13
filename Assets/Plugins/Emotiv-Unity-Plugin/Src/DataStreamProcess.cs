@@ -43,10 +43,10 @@ namespace EmotivUnityPlugin
         public event EventHandler<List<string>> StreamStopNotify;
         public event EventHandler<string> SessionClosedNotify;
 
-        public event EventHandler<SessionEventArgs> SessionActivedOK
+        public event EventHandler<SessionEventArgs> SessionActivatedOK
         {
-            add { _sessionHandler.SessionActived += value; }
-            remove { _sessionHandler.SessionActived -= value; }
+            add { _sessionHandler.SessionActivated += value; }
+            remove { _sessionHandler.SessionActivated -= value; }
         }
         public event EventHandler<string> CreateSessionFail;
 

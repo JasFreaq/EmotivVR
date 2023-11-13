@@ -78,11 +78,12 @@ namespace EmotivUnityPlugin
             Init();
         }
 
-        ~DataStreamManager()
-        {
-        }
+        ~DataStreamManager() { }
+
         public static DataStreamManager Instance { get; } = new DataStreamManager();
+
         public bool IsDataBufferUsing { get => _isDataBufferUsing; set => _isDataBufferUsing = value; }
+
         public bool IsSessionCreated {get => _isSessActivated;}
 
         public bool IsHeadsetScanning { get => _isHeadsetScanning;}
@@ -95,7 +96,7 @@ namespace EmotivUnityPlugin
             _dsProcess.StreamStopNotify         += OnStreamStopNotify;
             _dsProcess.LicenseValidTo           += OnLicenseValidTo;
             _dsProcess.LicenseExpired           += OnLicenseExpired;
-            _dsProcess.SessionActivedOK         += OnSessionActivedOK;
+            _dsProcess.SessionActivatedOK       += OnSessionActivatedOK;
             _dsProcess.CreateSessionFail        += OnCreateSessionFail;
             _dsProcess.QueryHeadsetOK           += OnQueryHeadsetOK;
             _dsProcess.UserLogoutNotify         += OnUserLogoutNotify;
@@ -171,7 +172,7 @@ namespace EmotivUnityPlugin
 
         private void OnQueryHeadsetOK(object sender, List<Headset> headsets)
         {
-            lock(_locker)
+            lock (_locker) 
             {
                 _detectedHeadsets.Clear();
                 string strOut = "";
@@ -203,19 +204,23 @@ namespace EmotivUnityPlugin
             }
         }
 
-        private void OnSessionActivedOK(object sender, SessionEventArgs sessionInfo)
+        private void OnSessionActivatedOK(object sender, SessionEventArgs sessionInfo)
         {
             lock (_locker)
             {
-                UnityEngine.Debug.Log("DataStreamManager: OnSessionActivedOK " + sessionInfo.HeadsetId);
-                if (sessionInfo.HeadsetId == _wantedHeadsetId) {
+                UnityEngine.Debug.Log("DataStreamManager: OnSessionActivatedOK " + sessionInfo.HeadsetId);
+                SessionActivatedOK(this, _wantedHeadsetId);
+
+                if (sessionInfo.HeadsetId == _wantedHeadsetId) 
+                {
                     _isSessActivated    = true;
                     _readyCreateSession = false;
-                    SessionActivatedOK(this, _wantedHeadsetId);
+                    
                     // subscribe data
                     _dsProcess.SubscribeData();
                 }
-                else {
+                else 
+                {
                     //TODO:
                     UnityEngine.Debug.Log("Session is activated but for headset " + sessionInfo.HeadsetId);
                 }
@@ -465,6 +470,7 @@ namespace EmotivUnityPlugin
             
              SysEventsReceived(this, sysEvent);
         }
+
         private bool isConnectedHeadset(string headsetId) 
         {
             lock (_locker)
@@ -477,7 +483,6 @@ namespace EmotivUnityPlugin
                 }
                 return false;
             }
-            
         }
 
         private void CloseSession()

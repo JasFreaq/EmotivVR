@@ -72,6 +72,7 @@ public class DataProcessing
         DataStreamManager.Instance.SessionActivatedOK += OnSessionActivatedOK;
         DataStreamManager.Instance.LicenseValidTo  += onLicenseValidTo;
     }
+
     ~DataProcessing()
     {
     }

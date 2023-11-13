@@ -99,6 +99,10 @@ namespace EmotivUnityPlugin
         public event EventHandler<string> RenameProfileOK;
         public event EventHandler<JArray> QueryProfileOK;
         public event EventHandler<double> GetTrainingTimeDone;
+        public event EventHandler<JObject> GetTrainedSignatureActions;
+        public event EventHandler<JObject> GetMentalCommandActiveAction;
+        public event EventHandler<JObject> GetMentalCommandBrainMap;
+        public event EventHandler<JArray> GetMentalCommandTrainingThreshold;
         public event EventHandler<JObject> TrainingOK;
         public event EventHandler<string> StreamStopNotify;
         public event EventHandler<string> SessionClosedNotify;
@@ -111,6 +115,7 @@ namespace EmotivUnityPlugin
         {
             
         }
+
         public void InitWebSocketClient()
         {
             _nextRequestId = 1;
@@ -265,8 +270,10 @@ namespace EmotivUnityPlugin
                 if (response["time"] != null)
                     time = (double)response["time"];
 
-                foreach (JProperty property in response.Properties()) {
-                    if (property.Name != "sid" && property.Name != "time") {
+                foreach (JProperty property in response.Properties()) 
+                {
+                    if (property.Name != "sid" && property.Name != "time") 
+                    {
                         ArrayList data = new ArrayList();
                         data.Add(time); // insert timestamp to datastream
                         // spread to one array intead of a array included in a array
@@ -510,6 +517,22 @@ namespace EmotivUnityPlugin
             else if (method == "getTrainingTime")
             {
                 GetTrainingTimeDone(this, (double)data["time"]);
+            }
+            else if (method == "getTrainedSignatureActions")
+            {
+                GetTrainedSignatureActions(this, (JObject)data);
+            }
+            else if (method == "mentalCommandActiveAction")
+            {
+                GetMentalCommandActiveAction(this, (JObject)data);
+            }
+            else if (method == "mentalCommandBrainMap")
+            {
+                GetMentalCommandBrainMap(this, (JObject)data);
+            }
+            else if (method == "mentalCommandTrainingThreshold")
+            {
+                GetMentalCommandTrainingThreshold(this, (JArray)data);
             }
         }
 

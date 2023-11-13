@@ -16,8 +16,8 @@ namespace EmotivUnityPlugin
         private DataStreamManager _dsManager = DataStreamManager.Instance;
         private BCITraining _bciTraining = BCITraining.Instance;
         private RecordManager _recordMgr = RecordManager.Instance;
-        private CortexClient   _ctxClient  = CortexClient.Instance;
-
+        private CortexClient _ctxClient = CortexClient.Instance;
+        
         bool _isAuthorizedOK = false;
         bool _isRecording = false;
 
@@ -58,7 +58,7 @@ namespace EmotivUnityPlugin
         }
 
         // Init
-        public void Init(string clientId, string clientSecret, string appName, 
+        public void Init(string clientId, string clientSecret, string appName,
                          string appVersion = "", bool isDataBufferUsing = true)
         {
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
@@ -99,7 +99,7 @@ namespace EmotivUnityPlugin
             // bci training
             _bciTraining.InformLoadUnLoadProfileDone += OnInformLoadUnLoadProfileDone;
             // get error message
-            _ctxClient.ErrorMsgReceived             += MessageErrorRecieved;
+            _ctxClient.ErrorMsgReceived += MessageErrorRecieved;
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace EmotivUnityPlugin
             _dsManager.UnSubscribeData(streamNameList);
         }
 
-        
+
         // --------Get subscribed data from buffer---------
         /// <summary>
         /// Get EEG channels lists.
@@ -161,6 +161,7 @@ namespace EmotivUnityPlugin
         {
             return _dsManager.GetEEGChannels();
         }
+
         /// <summary>
         /// Get EEG data by channel.
         /// </summary>
@@ -287,7 +288,7 @@ namespace EmotivUnityPlugin
         }
 
         //--------End functions which get data from buffer--------------
-        
+
         /// <summary>
         /// Create a record
         /// </summary>
@@ -473,7 +474,8 @@ namespace EmotivUnityPlugin
             {
                 _messageLog = "The profile is loaded successfully.";
             }
-            else {
+            else
+            {
                 _messageLog = "The profile is unloaded successfully.";
             }
         }
@@ -499,7 +501,7 @@ namespace EmotivUnityPlugin
         private void OnInformMarkerResult(object sender, JObject markerObj)
         {
             UnityEngine.Debug.Log("OnInformMarkerResult");
-            _messageLog = "The marker " + markerObj["uuid"].ToString() + ", label: " 
+            _messageLog = "The marker " + markerObj["uuid"].ToString() + ", label: "
                 + markerObj["label"].ToString() + ", value: " + markerObj["value"].ToString()
                 + ", type: " + markerObj["type"].ToString() + ", started at: " + markerObj["startDatetime"].ToString();
         }
@@ -519,7 +521,8 @@ namespace EmotivUnityPlugin
         private void OnBandPowerDataReceived(object sender, ArrayList e)
         {
             string dataText = "pow data: ";
-            foreach (var item in e) {
+            foreach (var item in e)
+            {
                 dataText += item.ToString() + ",";
             }
             // print out data to console
@@ -529,7 +532,8 @@ namespace EmotivUnityPlugin
         private void OnPerfDataReceived(object sender, ArrayList e)
         {
             string dataText = "met data: ";
-            foreach (var item in e) {
+            foreach (var item in e)
+            {
                 dataText += item.ToString() + ",";
             }
             // print out data to console
@@ -539,7 +543,8 @@ namespace EmotivUnityPlugin
         private void OnDevDataReceived(object sender, ArrayList e)
         {
             string dataText = "dev data: ";
-            foreach (var item in e) {
+            foreach (var item in e)
+            {
                 dataText += item.ToString() + ",";
             }
             // print out data to console
@@ -549,7 +554,8 @@ namespace EmotivUnityPlugin
         private void OnMotionDataReceived(object sender, ArrayList e)
         {
             string dataText = "mot data: ";
-            foreach (var item in e) {
+            foreach (var item in e)
+            {
                 dataText += item.ToString() + ",";
             }
             // print out data to console
@@ -559,7 +565,8 @@ namespace EmotivUnityPlugin
         private void OnEEGDataReceived(object sender, ArrayList e)
         {
             string dataText = "eeg data: ";
-            foreach (var item in e) {
+            foreach (var item in e)
+            {
                 dataText += item.ToString() + ",";
             }
             // print out data to console
@@ -570,7 +577,7 @@ namespace EmotivUnityPlugin
         {
             string dataText = "sys data: " + data.Detection + ", event: " + data.EventMessage + ", time " + data.Time.ToString();
             // print out data to console
-            UnityEngine.Debug.Log(dataText);
+            //UnityEngine.Debug.Log(dataText);
             // show the system event to message log
             _messageLog = dataText;
         }
@@ -584,7 +591,7 @@ namespace EmotivUnityPlugin
 
         private void OnFacialExpReceived(object sender, FacEventArgs data)
         {
-            string dataText = "fac data: eye act " + data.EyeAct+ ", upper act: " +
+            string dataText = "fac data: eye act " + data.EyeAct + ", upper act: " +
                                 data.UAct + ", upper act power " + data.UPow.ToString() + ", lower act: " +
                                 data.LAct + ", lower act power " + data.LPow.ToString() + ", time: " + data.Time.ToString();
             // print out data to console
@@ -593,11 +600,11 @@ namespace EmotivUnityPlugin
 
         private void MessageErrorRecieved(object sender, ErrorMsgEventArgs errorInfo)
         {
-            string message  = errorInfo.MessageError;
-            string method   = errorInfo.MethodName;
-            int errorCode   = errorInfo.Code;
+            string message = errorInfo.MessageError;
+            string method = errorInfo.MethodName;
+            int errorCode = errorInfo.Code;
 
-            _messageLog = "Get Error: errorCode " + errorCode.ToString() + ", message: " + message + ", API: " + method;  
+            _messageLog = "Get Error: errorCode " + errorCode.ToString() + ", message: " + message + ", API: " + method;
         }
 
     }

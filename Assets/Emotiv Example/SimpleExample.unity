@@ -496,7 +496,7 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: pull
       m_Image: {fileID: 0}
-    - m_Text: lift
+    - m_Text: charge
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
