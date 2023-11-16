@@ -553,6 +553,7 @@ namespace EmotivUnityPlugin
         public string Act { get; set; }
         public double Pow { get; set; }
     }
+
     // Facial expression data object
     public class FacEventArgs
     {
@@ -599,11 +600,15 @@ namespace EmotivUnityPlugin
             Events      = new List<string>();
             Signature   = new List<string>();
         }
+
         public string DetectionName { get;}
+
         public List<string> Actions { get; set; }
+
         public List<string> Controls { get; set; }
+
         public List<string> Events { get; set; }
+
         public List<string> Signature { get; set; }
     }
-    
 }

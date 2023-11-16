@@ -99,10 +99,10 @@ namespace EmotivUnityPlugin
         public event EventHandler<string> RenameProfileOK;
         public event EventHandler<JArray> QueryProfileOK;
         public event EventHandler<double> GetTrainingTimeDone;
-        public event EventHandler<JObject> GetTrainedSignatureActions;
-        public event EventHandler<JObject> GetMentalCommandActiveAction;
-        public event EventHandler<JObject> GetMentalCommandBrainMap;
-        public event EventHandler<JArray> GetMentalCommandTrainingThreshold;
+        public event EventHandler<JObject> GetTrainedSignatureActionsOK;
+        public event EventHandler<JObject> MentalCommandActiveActionOK;
+        public event EventHandler<JArray> MentalCommandBrainMapOK;
+        public event EventHandler<JObject> MentalCommandTrainingThresholdOK;
         public event EventHandler<JObject> TrainingOK;
         public event EventHandler<string> StreamStopNotify;
         public event EventHandler<string> SessionClosedNotify;
@@ -111,10 +111,7 @@ namespace EmotivUnityPlugin
 
         public event EventHandler<bool> BTLEPermissionGrantedNotify; // notify btle permision grant status
 
-        private CortexClient()
-        {
-            
-        }
+        private CortexClient() { }
 
         public void InitWebSocketClient()
         {
@@ -147,12 +144,12 @@ namespace EmotivUnityPlugin
         /// Singleton Instance of Cortex Client
         /// </summary>
         public static CortexClient Instance { get; } = new CortexClient();
-
-
+        
         /// <summary>
         /// Set up timer for connecting to Emotiv Cortex service
         /// </summary>
-        private void SetWSCTimer() {
+        private void SetWSCTimer() 
+        {
             if (_wscTimer != null)
                 return;
             _wscTimer = new System.Timers.Timer(Config.RETRY_CORTEXSERVICE_TIME);
@@ -172,7 +169,8 @@ namespace EmotivUnityPlugin
             RetryConnect();
         }
 
-        private void RetryConnect() {
+        private void RetryConnect() 
+        {
            m_OpenedEvent.Reset();
             if (_wSC == null || (_wSC.State != WebSocketState.None && _wSC.State != WebSocketState.Closed))
                 return;
@@ -520,19 +518,19 @@ namespace EmotivUnityPlugin
             }
             else if (method == "getTrainedSignatureActions")
             {
-                GetTrainedSignatureActions(this, (JObject)data);
+                GetTrainedSignatureActionsOK(this, (JObject)data);
             }
             else if (method == "mentalCommandActiveAction")
             {
-                GetMentalCommandActiveAction(this, (JObject)data);
+                MentalCommandActiveActionOK(this, (JObject)data);
             }
             else if (method == "mentalCommandBrainMap")
             {
-                GetMentalCommandBrainMap(this, (JObject)data);
+                MentalCommandBrainMapOK(this, (JArray)data);
             }
             else if (method == "mentalCommandTrainingThreshold")
             {
-                GetMentalCommandTrainingThreshold(this, (JArray)data);
+                MentalCommandTrainingThresholdOK(this, (JObject)data);
             }
         }
 
@@ -927,6 +925,7 @@ namespace EmotivUnityPlugin
             param.Add("detection", detection);
             SendTextMessage(param, "getDetectionInfo", true);
         }
+
         // getCurrentProfile
         // Required params: cortexToken, headset
         public void GetCurrentProfile(string cortexToken, string headsetId)
@@ -936,6 +935,7 @@ namespace EmotivUnityPlugin
             param.Add("headset", headsetId);
             SendTextMessage(param, "getCurrentProfile", true);
         }
+
         // setupProfile
         // Required params: cortexToken, profile, status
         public void SetupProfile(string cortexToken, string profile, string status, string headsetId = null, string newProfileName = null)
@@ -952,6 +952,7 @@ namespace EmotivUnityPlugin
             }
             SendTextMessage(param, "setupProfile", true);
         }
+
         // queryProfile
         // Required params: cortexToken
         public void QueryProfile(string cortexToken)
@@ -960,6 +961,7 @@ namespace EmotivUnityPlugin
             param.Add("cortexToken", cortexToken);
             SendTextMessage(param, "queryProfile", true);
         }
+
         // getTrainingTime
         // Required params: cortexToken
         public void GetTrainingTime(string cortexToken, string detection, string sessionId)
@@ -970,6 +972,20 @@ namespace EmotivUnityPlugin
             param.Add("session", sessionId);
             SendTextMessage(param, "getTrainingTime", true);
         }
+
+        // training
+        // Required params: cortexToken, detection, profile, session
+        public void GetTrainedSignatureActions(string cortexToken, string detection, string profile, string sessionId)
+        {
+            JObject param = new JObject();
+            param.Add("cortexToken", cortexToken);
+            param.Add("detection", detection);
+            param.Add("profile", profile);
+            param.Add("session", sessionId);
+
+            SendTextMessage(param, "getTrainedSignatureActions", true);
+        }
+
         // training
         // Required params: cortexToken, profile, status
         public void Training(string cortexToken, string sessionId, string status, string detection, string action)
@@ -982,6 +998,45 @@ namespace EmotivUnityPlugin
             param.Add("action", action);
 
             SendTextMessage(param, "training", true);
+        }
+
+        public void MentalCommandActiveAction(string cortexToken, string status, string profileName, string sessionId,
+            string[] actions)
+        {
+            JObject param = new JObject();
+            param.Add("cortexToken", cortexToken);
+            param.Add("status", status);
+            param.Add("profile", profileName);
+            param.Add("session", sessionId);
+
+            JArray actionArr = new JArray();
+            foreach (var ele in actions)
+            {
+                actionArr.Add(ele);
+            }
+            param.Add("actions", actionArr);
+
+            SendTextMessage(param, "mentalCommandActiveAction", true);
+        }
+
+        public void MentalCommandBrainMap(string cortexToken, string profileName, string sessionId)
+        {
+            JObject param = new JObject();
+            param.Add("cortexToken", cortexToken);
+            param.Add("profile", profileName);
+            param.Add("session", sessionId);
+
+            SendTextMessage(param, "mentalCommandBrainMap", true);
+        }
+
+        public void MentalCommandTrainingThreshold(string cortexToken, string profileName, string sessionId)
+        {
+            JObject param = new JObject();
+            param.Add("cortexToken", cortexToken);
+            param.Add("profile", profileName);
+            param.Add("session", sessionId);
+
+            SendTextMessage(param, "mentalCommandTrainingThreshold", true);
         }
     }
 }

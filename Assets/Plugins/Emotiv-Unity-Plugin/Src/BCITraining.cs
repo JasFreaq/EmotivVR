@@ -18,6 +18,7 @@ namespace EmotivUnityPlugin
         private string _wantedProfileName = "";
 
         private string _workingHeadsetId = "";
+
         private string _currAction = "";
 
 
@@ -37,6 +38,14 @@ namespace EmotivUnityPlugin
 
         public string WantedProfileName { get => _wantedProfileName; set => _wantedProfileName = value; }
 
+        public event Action<JObject> GetTrainedSignatureActionsOK;
+
+        public event Action<JObject> MentalCommandActiveActionOK;
+
+        public event Action<JArray> MentalCommandBrainMapOK;
+
+        public event Action<JObject> MentalCommandTrainingThresholdOK;
+
         /// <summary>
         /// Initial mental command training.
         /// </summary>
@@ -46,10 +55,10 @@ namespace EmotivUnityPlugin
             _trainingHandler.CreateProfileOK += OnCreateProfileOK;
             _trainingHandler.ProfileSavedOK += OnProfileSavedOK;
             _trainingHandler.TrainingOK += OnTrainingOK;
-            _trainingHandler.GetTrainedSignatureActions += OnGetTrainedSignatureActions;
-            _trainingHandler.GetMentalCommandActiveAction += OnGetMentalCommandActiveAction;
-            _trainingHandler.GetMentalCommandBrainMap += OnGetMentalCommandBrainMap;
-            _trainingHandler.GetMentalCommandTrainingThreshold += OnGetMentalCommandTrainingThreshold;
+            _trainingHandler.GetTrainedSignatureActionsOK += OnGetTrainedSignatureActionsOK;
+            _trainingHandler.GetMentalCommandActiveActionOK += OnGetMentalCommandActiveActionOk;
+            _trainingHandler.GetMentalCommandBrainMapOK += OnGetMentalCommandBrainMapOk;
+            _trainingHandler.GetMentalCommandTrainingThresholdOK += OnGetMentalCommandTrainingThresholdOk;
             _trainingHandler.GetDetectionInfoOK += OnGetDetectionInfoOK;
             _trainingHandler.ProfileLoaded += OnProfileLoaded;
             _trainingHandler.ProfileUnLoaded += OnProfileUnLoaded;
@@ -166,6 +175,29 @@ namespace EmotivUnityPlugin
         public void ResetTraining(string action, string detection)
         {
             _trainingHandler.DoTraining(action, "reset", detection);
+        }
+
+        public void GetTrainedSignatureActions(string detection, string profileName)
+        {
+            if (string.IsNullOrEmpty(detection))
+                _trainingHandler.GetTrainedSignatureActions(CurrDetection, profileName);
+            else
+                _trainingHandler.GetTrainedSignatureActions(detection, profileName);
+        }
+
+        public void MentalCommandActiveAction(string status, string profileName, string[] actions)
+        {
+            _trainingHandler.MentalCommandActiveAction(status, profileName, actions);
+        }
+        
+        public void MentalCommandBrainMap(string profileName)
+        {
+            _trainingHandler.MentalCommandBrainMap(profileName);
+        }
+        
+        public void MentalCommandTrainingThreshold(string profileName)
+        {
+            _trainingHandler.MentalCommandTrainingThreshold(profileName);
         }
 
         // Event handlers
@@ -291,24 +323,32 @@ namespace EmotivUnityPlugin
             UnityEngine.Debug.Log("The profile " + profileName + " is saved successfully.");
         }
 
-        private void OnGetTrainedSignatureActions(object sender, JObject result)
+        private void OnGetTrainedSignatureActionsOK(object sender, JObject result)
         {
             UnityEngine.Debug.Log("OnGetTrainedSignatureActions: " + result);
+
+            GetTrainedSignatureActionsOK(result);
         }
         
-        private void OnGetMentalCommandActiveAction(object sender, JObject result)
+        private void OnGetMentalCommandActiveActionOk(object sender, JObject result)
         {
             UnityEngine.Debug.Log("OnGetMentalCommandActiveAction: " + result);
+
+            MentalCommandActiveActionOK(result);
         }
         
-        private void OnGetMentalCommandBrainMap(object sender, JObject result)
+        private void OnGetMentalCommandBrainMapOk(object sender, JArray result)
         {
             UnityEngine.Debug.Log("OnGetMentalCommandBrainMap: " + result);
+
+            MentalCommandBrainMapOK(result);
         }
         
-        private void OnGetMentalCommandTrainingThreshold(object sender, JArray result)
+        private void OnGetMentalCommandTrainingThresholdOk(object sender, JObject result)
         {
             UnityEngine.Debug.Log("OnGetMentalCommandTrainingThreshold: " + result);
+
+            MentalCommandTrainingThresholdOK(result);
         }
     }
 }

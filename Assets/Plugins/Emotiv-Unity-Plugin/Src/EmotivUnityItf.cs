@@ -14,21 +14,30 @@ namespace EmotivUnityPlugin
     public class EmotivUnityItf
     {
         private DataStreamManager _dsManager = DataStreamManager.Instance;
+
         private BCITraining _bciTraining = BCITraining.Instance;
+
         private RecordManager _recordMgr = RecordManager.Instance;
+
         private CortexClient _ctxClient = CortexClient.Instance;
         
         bool _isAuthorizedOK = false;
+
         bool _isRecording = false;
 
         bool _isProfileLoaded = false;
+
         private string _workingHeadsetId = "";
+
         private string _dataSubLog = ""; // data subscribing log
+
         private string _trainingLog = ""; // training log
 
         private string _messageLog = "";
 
         public static EmotivUnityItf Instance { get; } = new EmotivUnityItf();
+
+        public BCITraining BciTraining => _bciTraining;
 
         public bool IsAuthorizedOK => _isAuthorizedOK;
 
@@ -37,11 +46,14 @@ namespace EmotivUnityPlugin
         public bool IsProfileLoaded => _isProfileLoaded;
 
         public bool IsRecording { get => _isRecording; set => _isRecording = value; }
+
         public string DataSubLog { get => _dataSubLog; set => _dataSubLog = value; }
+
         public string TrainingLog { get => _trainingLog; set => _trainingLog = value; }
+
         public string MessageLog { get => _messageLog; set => _messageLog = value; }
 
-
+        public event EventHandler<SysEventArgs> SysEventsReceived;
 
         /// <summary>
         /// Set up App configuration.
@@ -402,6 +414,26 @@ namespace EmotivUnityPlugin
             _bciTraining.ResetTraining(action, "mentalCommand");
         }
 
+        public void GetMCTrainedSignatureActions(string profileName)
+        {
+            _bciTraining.GetTrainedSignatureActions("mentalCommand", profileName);
+        }
+        
+        public void SetMCCommandActiveAction(string profileName, string[] actions)
+        {
+            _bciTraining.MentalCommandActiveAction("set", profileName, actions);
+        }
+        
+        public void GetMCBrainMap(string profileName)
+        {
+            _bciTraining.MentalCommandBrainMap(profileName);
+        }
+        
+        public void GetMCTrainingThreshold(string profileName)
+        {
+            _bciTraining.MentalCommandTrainingThreshold(profileName);
+        }
+
         // training fe
         /// <summary>
         /// Start a Facial Expression Training
@@ -577,9 +609,11 @@ namespace EmotivUnityPlugin
         {
             string dataText = "sys data: " + data.Detection + ", event: " + data.EventMessage + ", time " + data.Time.ToString();
             // print out data to console
-            //UnityEngine.Debug.Log(dataText);
+            UnityEngine.Debug.Log(dataText);
             // show the system event to message log
             _messageLog = dataText;
+
+            SysEventsReceived(this, data);
         }
 
         private void OnMentalCommandReceived(object sender, MentalCommandEventArgs data)

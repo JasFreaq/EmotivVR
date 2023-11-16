@@ -1,25 +1,39 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class TrainingUIHandler : MonoBehaviour
 {
     [System.Serializable]
-    private struct ProfileData
+    private struct TrainingThresholdElement
+    {
+        public Transform mThresholdIndicator;
+        
+        public Slider mThresholdSlider;
+    }
+
+    [System.Serializable]
+    private struct ActionUIElement
     {
         public Transform mBrainmapMarker;
 
         public Image mButtonHighlightImage;
 
-        public string mProfileName;
+        public TextMeshProUGUI mSkillLevelText;
+
+        public TrainingThresholdElement mThresholdElement;
     }
 
-    [SerializeField] private ProfileData[] m_profileData;
+    [SerializeField] private float m_brainMapRadius = 200f;
+    [SerializeField] private float m_thresholdIndicatorHalfRange = 70f;
+    [SerializeField] private ActionUIElement[] m_actionUIElements;
 
-    [Header("Buttons")]
+    [Header("Training Buttons")]
     [SerializeField] private Button m_loadProfileButton;
     [SerializeField] private Button m_startButton;
     [SerializeField] private Button m_eraseButton;
@@ -27,19 +41,24 @@ public class TrainingUIHandler : MonoBehaviour
     [SerializeField] private Button m_acceptButton;
     [SerializeField] private Button m_rejectButton;
 
-    private ProfileData m_currentProfile;
+    private int m_currentActionIndex = -1;
 
-    public string CurrentProfileName => m_currentProfile.mProfileName;
-    
-    public void SelectProfile(int profileIndex)
+    private bool m_isTraining;
+
+    public int currentActionIndex => m_currentActionIndex;
+
+    public void SelectAction(int actionIndex)
     {
-        foreach (ProfileData profile in m_profileData)
+        if (!m_isTraining) 
         {
-            profile.mButtonHighlightImage.enabled = false;
-        }
+            foreach (ActionUIElement actionUI in m_actionUIElements)
+            {
+                actionUI.mButtonHighlightImage.enabled = false;
+            }
 
-        m_currentProfile = m_profileData[profileIndex];
-        m_currentProfile.mButtonHighlightImage.enabled = true;
+            m_currentActionIndex = actionIndex;
+            m_actionUIElements[m_currentActionIndex].mButtonHighlightImage.enabled = true;
+        }
     }
 
     public void EnableLoadProfileButton()
@@ -55,15 +74,20 @@ public class TrainingUIHandler : MonoBehaviour
         
         m_acceptButton.gameObject.SetActive(false);
         m_rejectButton.gameObject.SetActive(false);
+
+        DisableTrainingThresholdElement();
+
+        m_isTraining = false;
     }
     
     public void SetTrainingState()
     {
         m_startButton.gameObject.SetActive(false);
         m_eraseButton.gameObject.SetActive(false);
-        Debug.Log("Test");
 
         m_cancelButton.gameObject.SetActive(true);
+
+        m_isTraining = true;
     }
 
     public void SetTrainedState()
@@ -72,6 +96,56 @@ public class TrainingUIHandler : MonoBehaviour
 
         m_acceptButton.gameObject.SetActive(true);
         m_rejectButton.gameObject.SetActive(true);
+    }
+
+    public void EnableAllActions()
+    {
+        for (int i = 1, l = m_actionUIElements.Length; i < l; i++)
+        {
+            ActionUIElement actionElement = m_actionUIElements[i];
+            actionElement.mButtonHighlightImage.gameObject.SetActive(true);
+        }
+    }
+
+    public void UpdateSkillLevel(int level)
+    {
+        TextMeshProUGUI skillLevelText = m_actionUIElements[m_currentActionIndex].mSkillLevelText;
+        skillLevelText.text = level.ToString();
+    }
+    
+    public void UpdateBrainMarkers(int index, Vector2 coordinates)
+    {
+        Transform brainmapMarker = m_actionUIElements[index].mBrainmapMarker;
+
+        float radius = Mathf.Sqrt(coordinates.x * coordinates.x + coordinates.y * coordinates.y) * m_brainMapRadius;
+        float angle = Mathf.Atan2(coordinates.y, coordinates.x);
+
+        float newRadius = 2 * angle;
+
+        Vector2 newCoordinates = new Vector2(radius * Mathf.Cos(angle), radius * Mathf.Sin(angle));
+        brainmapMarker.localPosition = newCoordinates;
+
+        if (!brainmapMarker.gameObject.activeSelf)
+            brainmapMarker.gameObject.SetActive(true);
+    }
+
+    public void EnableTrainingThresholdElement(float currentThreshold, float lastTrainingScore)
+    {
+        TrainingThresholdElement thresholdElement = m_actionUIElements[m_currentActionIndex].mThresholdElement;
+
+        Vector3 indicatorPosition = thresholdElement.mThresholdIndicator.localPosition;
+        indicatorPosition.x = Mathf.Lerp(-m_thresholdIndicatorHalfRange, m_thresholdIndicatorHalfRange, currentThreshold);
+        thresholdElement.mThresholdIndicator.localPosition = indicatorPosition;
+
+        thresholdElement.mThresholdSlider.value = lastTrainingScore;
+
+        thresholdElement.mThresholdIndicator.parent.gameObject.SetActive(true);
+    }
+    
+    private void DisableTrainingThresholdElement()
+    {
+        TrainingThresholdElement thresholdElement = m_actionUIElements[m_currentActionIndex].mThresholdElement;
+        thresholdElement.mThresholdIndicator.parent.gameObject.SetActive(false);
     }
 
     public void SubscribeToStartButton(Action action)

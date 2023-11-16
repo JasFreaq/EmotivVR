@@ -20,9 +20,13 @@ namespace EmotivUnityPlugin
 
         // event
         public event EventHandler<List<string>> QueryProfileOK;
+
         public event EventHandler<string> ProfileLoaded;
+
         public event EventHandler<bool> ProfileUnLoaded;
+
         public event EventHandler<bool> TrainingSucceeded;
+
         public event EventHandler<bool> ReadyForTraining;
 
         public event EventHandler<string> ProfileSavedOK
@@ -49,28 +53,28 @@ namespace EmotivUnityPlugin
             remove { _ctxClient.GetCurrentProfileDone -= value; }
         }
 
-        public event EventHandler<JObject> GetTrainedSignatureActions
+        public event EventHandler<JObject> GetTrainedSignatureActionsOK
         {
-            add { _ctxClient.GetTrainedSignatureActions += value; }
-            remove { _ctxClient.GetTrainedSignatureActions -= value; }
+            add { _ctxClient.GetTrainedSignatureActionsOK += value; }
+            remove { _ctxClient.GetTrainedSignatureActionsOK -= value; }
         }
         
-        public event EventHandler<JObject> GetMentalCommandActiveAction
+        public event EventHandler<JObject> GetMentalCommandActiveActionOK
         {
-            add { _ctxClient.GetMentalCommandActiveAction += value; }
-            remove { _ctxClient.GetMentalCommandActiveAction -= value; }
+            add { _ctxClient.MentalCommandActiveActionOK += value; }
+            remove { _ctxClient.MentalCommandActiveActionOK -= value; }
         }
         
-        public event EventHandler<JObject> GetMentalCommandBrainMap
+        public event EventHandler<JArray> GetMentalCommandBrainMapOK
         {
-            add { _ctxClient.GetMentalCommandBrainMap += value; }
-            remove { _ctxClient.GetMentalCommandBrainMap -= value; }
+            add { _ctxClient.MentalCommandBrainMapOK += value; }
+            remove { _ctxClient.MentalCommandBrainMapOK -= value; }
         }
         
-        public event EventHandler<JArray> GetMentalCommandTrainingThreshold
+        public event EventHandler<JObject> GetMentalCommandTrainingThresholdOK
         {
-            add { _ctxClient.GetMentalCommandTrainingThreshold += value; }
-            remove { _ctxClient.GetMentalCommandTrainingThreshold -= value; }
+            add { _ctxClient.MentalCommandTrainingThresholdOK += value; }
+            remove { _ctxClient.MentalCommandTrainingThresholdOK -= value; }
         }
 
         public event EventHandler<DetectionInfo> GetDetectionInfoOK;
@@ -167,6 +171,30 @@ namespace EmotivUnityPlugin
         public void GetCurrentProfile(string headsetId)
         {
             _ctxClient.GetCurrentProfile(_authorizer.CortexToken, headsetId);
+        }
+
+        public void GetTrainedSignatureActions(string detection, string profileName)
+        {
+            _ctxClient.GetTrainedSignatureActions(_authorizer.CortexToken, detection, profileName,
+                _sessionHandler.SessionId);
+        }
+
+        public void MentalCommandActiveAction(string status, string profileName, string[] actions)
+        {
+            _ctxClient.MentalCommandActiveAction(_authorizer.CortexToken, status, profileName,
+                _sessionHandler.SessionId, actions);
+        }
+        
+        public void MentalCommandBrainMap(string profileName)
+        {
+            _ctxClient.MentalCommandBrainMap(_authorizer.CortexToken, profileName,
+                _sessionHandler.SessionId);
+        }
+        
+        public void MentalCommandTrainingThreshold(string profileName)
+        {
+            _ctxClient.MentalCommandTrainingThreshold(_authorizer.CortexToken, profileName,
+                _sessionHandler.SessionId);
         }
 
         public void DoTraining(string action, string status, string detection)
