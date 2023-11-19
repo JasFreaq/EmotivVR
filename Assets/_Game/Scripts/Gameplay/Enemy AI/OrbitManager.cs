@@ -6,6 +6,7 @@ using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 using Vector2 = UnityEngine.Vector2;
+using TMPro;
 
 public class OrbitManager : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class OrbitManager : MonoBehaviour
     [SerializeField] private float m_semiMajorAxis = 50f;
     [SerializeField] private float m_semiMinorAxis = 30f;
     [SerializeField] private Vector3Int m_orbitMemberRange = new Vector3Int(2, 2, 2);
-    [SerializeField] private int m_orbitThicknessRange = 2;
+    [SerializeField] private Vector3Int m_orbitThicknessRange = new Vector3Int(2, 2, 2);
     [SerializeField] private Vector3 m_orbitNormal = Vector3.forward;
     [SerializeField] private Vector3 m_orbitReferenceTangent = Vector3.right;
 
@@ -21,9 +22,12 @@ public class OrbitManager : MonoBehaviour
     [SerializeField] private SatelliteHandler m_satellitePrefab;
     [SerializeField] private float m_satelliteSpeed = 60f;
     [SerializeField] private int m_satelliteCount = 100;
-    [SerializeField] private LayerMask m_satelliteLayer;
 
     private SatelliteHandler[] m_satellites;
+    
+    bool m_beganOrbiting = false;
+
+    private float m_currentAngle;
 
     private void Start()
     {
@@ -32,7 +36,7 @@ public class OrbitManager : MonoBehaviour
 
         for (int i = 0; i < m_satelliteCount; i++)
         {
-            SatelliteHandler satellite = Instantiate(m_satellitePrefab, transform);
+            SatelliteHandler satellite = Instantiate(m_satellitePrefab);
             
             Vector3 satelliteRandomPos = GenerateRandomPointOnEllipse(satellitePositionsMap, satellite);
             
@@ -49,7 +53,7 @@ public class OrbitManager : MonoBehaviour
 
     private Vector3 GenerateRandomPointOnEllipse(HashSet<Vector3Int> satellitePositionsMap, SatelliteHandler satellite)
     {
-        Vector3Int randomPos;
+        Vector3Int randomPosition;
 
         do
         {
@@ -64,41 +68,50 @@ public class OrbitManager : MonoBehaviour
             int xPos = Mathf.RoundToInt((m_semiMajorAxis + satellite.SpawnOffset.x) * Mathf.Cos(angle));
             int yPos = Mathf.RoundToInt((m_semiMinorAxis + satellite.SpawnOffset.y) * Mathf.Sin(angle));
 
-            randomPos = new Vector3Int(xPos, yPos, satellite.SpawnOffset.z) * m_orbitThicknessRange;
+            randomPosition = new Vector3Int(xPos, yPos, satellite.SpawnOffset.z) * m_orbitThicknessRange;
 
-        } while (satellitePositionsMap.Contains(randomPos));
+        } while (satellitePositionsMap.Contains(randomPosition));
 
-        satellitePositionsMap.Add(randomPos);
+        satellitePositionsMap.Add(randomPosition);
 
         float signedAngle =
-            Vector3.SignedAngle(randomPos - transform.position, m_orbitReferenceTangent, Vector3.forward);
+            Vector3.SignedAngle(randomPosition - transform.position, m_orbitReferenceTangent, Vector3.forward);
         signedAngle = (signedAngle + 360f) % 360f;
         satellite.InitialAngle = signedAngle;
 
-        return Quaternion.FromToRotation(Vector3.forward, m_orbitNormal) * randomPos;
+        return transform.position + Quaternion.FromToRotation(Vector3.forward, m_orbitNormal) * randomPosition;
     }
 
     private void PerformOrbiting()
     {
+        m_currentAngle += m_satelliteSpeed * Time.deltaTime;
+        m_currentAngle %= 360f;
+
         foreach (SatelliteHandler satellite in m_satellites)
         {
-            satellite.CurrentAngle += m_satelliteSpeed * Time.deltaTime;
-            float angle = (satellite.InitialAngle + satellite.CurrentAngle) % 360f;
+            float angle = satellite.InitialAngle + m_currentAngle;
 
             int xPos = Mathf.RoundToInt((m_semiMajorAxis + satellite.SpawnOffset.x) * Mathf.Cos(Mathf.Deg2Rad * angle));
             int yPos = Mathf.RoundToInt((m_semiMinorAxis + satellite.SpawnOffset.y) * Mathf.Sin(Mathf.Deg2Rad * angle));
 
-            Vector3 rotatedPosition = new Vector3(xPos, yPos, satellite.SpawnOffset.z) * m_orbitThicknessRange;
+            Vector3Int targetPosition = new Vector3Int(xPos, yPos, satellite.SpawnOffset.z) * m_orbitThicknessRange;
 
-            Vector3 finalPosition = transform.position +
-                                    Quaternion.FromToRotation(Vector3.forward, m_orbitNormal) * rotatedPosition;
+            Vector3 rotatedPosition = transform.position +
+                                    Quaternion.FromToRotation(Vector3.forward, m_orbitNormal) * targetPosition;
 
-            satellite.transform.position = finalPosition;
+            Vector3 smoothedPosition = Vector3.Lerp(satellite.transform.position, rotatedPosition,
+                m_beganOrbiting ? Time.deltaTime : 1f);
+            satellite.transform.position = smoothedPosition;
 
-            Vector3 toCenter = transform.position - finalPosition;
-            Vector3 direction = Vector3.Cross(toCenter, m_orbitNormal).normalized;
+            Vector3 lookDirection = Vector3.Cross(transform.position - smoothedPosition, m_orbitNormal).normalized;
+            Vector3 upDirection = (transform.position - satellite.transform.position).normalized;
 
-            satellite.transform.rotation = Quaternion.LookRotation(direction, m_orbitNormal);
+            satellite.transform.rotation = Quaternion.LookRotation(lookDirection, upDirection);
+        }
+
+        if (!m_beganOrbiting)
+        {
+            m_beganOrbiting = true;
         }
     }
 }

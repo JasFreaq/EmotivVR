@@ -107,9 +107,9 @@ public class TrainingUIHandler : MonoBehaviour
         }
     }
 
-    public void UpdateSkillLevel(int level)
+    public void UpdateSkillLevel(int index, int level)
     {
-        TextMeshProUGUI skillLevelText = m_actionUIElements[m_currentActionIndex].mSkillLevelText;
+        TextMeshProUGUI skillLevelText = m_actionUIElements[index].mSkillLevelText;
         skillLevelText.text = level.ToString();
     }
     

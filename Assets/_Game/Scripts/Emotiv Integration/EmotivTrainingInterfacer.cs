@@ -16,6 +16,8 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
     private EmotivUnityItf m_emotivInterface = EmotivUnityItf.Instance;
 
+    private PlayerTrainingWrapper m_playerTrainingWrapper;
+
     private const float k_TimeUpdateData = 1f;
 
     private const bool k_IsDataBufferUsing = false; // default subscribed data will not saved to Data buffer
@@ -35,8 +37,15 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     private bool m_isAuthorized;
 
     private bool m_isSessionCreated;
+    
+    private bool m_isProfileLoaded;
 
-    private bool m_signatureActionsUpdated;
+    private bool m_checkedSignatureActionOnLoad;
+
+    private void Awake()
+    {
+        m_playerTrainingWrapper = GetComponent<PlayerTrainingWrapper>();
+    }
 
     private void Start()
     {
@@ -113,8 +122,9 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
             if (!m_isSessionCreated && m_emotivInterface.IsSessionCreated)
             {
-                m_emotivInterface.SubscribeData(new List<string> { "sys" });
+                m_emotivInterface.SubscribeData(new List<string> { "sys", "com" });
                 m_emotivInterface.SysEventsReceived += OnSysEventsReceived;
+                m_emotivInterface.MentalCommandReceived += OnMentalCommandReceived;
 
                 m_emotivInterface.BciTraining.GetTrainedSignatureActionsOK += OnTrainedSignatureActions;
                 m_emotivInterface.BciTraining.MentalCommandBrainMapOK += OnMentalCommandBrainMap;
@@ -122,9 +132,27 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
                 m_isSessionCreated = true;
             }
+
+            if (!m_isProfileLoaded && m_emotivInterface.IsProfileLoaded)
+            {
+                m_emotivInterface.GetMCTrainedSignatureActions(k_ProfileName);
+                m_emotivInterface.GetMCBrainMap(k_ProfileName);
+
+                m_isProfileLoaded = true;
+            }
         }
 
         ProcessEventQueues();
+    }
+
+    private void OnDisable()
+    {
+        m_trainingUI.UnsubscribeEventsFromAllButtons();
+    }
+
+    void OnApplicationQuit()
+    {
+        m_emotivInterface.Stop();
     }
 
     private void ProcessEventQueues()
@@ -144,23 +172,19 @@ public class EmotivTrainingInterfacer : MonoBehaviour
             ProcessMentalCommandBrainMap(m_brainMapQueue.Dequeue());
         }
 
-        if (m_trainingThresholdQueue.Count > 0 && m_signatureActionsUpdated)
+        if (m_trainingThresholdQueue.Count > 0)
         {
             ProcessCommandTrainingThreshold(m_trainingThresholdQueue.Dequeue());
         }
     }
 
-    private void OnDisable()
-    {
-        m_trainingUI.UnsubscribeEventsFromAllButtons();
-    }
 
     public void LoadProfile()
     {
         m_emotivInterface.LoadProfile(k_ProfileName);
     }
     
-    private void OnSysEventsReceived(object sender, SysEventArgs data)
+    private void OnSysEventsReceived(SysEventArgs data)
     {
         if (Enum.TryParse(data.EventMessage, out SystemEvent mentalEvent))
         {
@@ -169,6 +193,14 @@ public class EmotivTrainingInterfacer : MonoBehaviour
         else
         {
             Debug.LogError("Invalid Event received from SysEvent stream.");
+        }
+    }
+    
+    private void OnMentalCommandReceived(MentalCommandEventArgs data)
+    {
+        if (data.Act == "pull")
+        {
+            m_playerTrainingWrapper.EnqueuePlayerInput((float)data.Pow);
         }
     }
 
@@ -185,19 +217,26 @@ public class EmotivTrainingInterfacer : MonoBehaviour
                 m_emotivInterface.GetMCTrainingThreshold(k_ProfileName);
                 break;
 
+            case SystemEvent.MC_DataErased:
+                m_emotivInterface.SaveProfile(k_ProfileName);
+                break;
+
             case SystemEvent.MC_Reset:
                 m_trainingUI.SetBaseState();
                 break;
 
             case SystemEvent.MC_Completed:
                 m_trainingUI.SetBaseState();
-                m_signatureActionsUpdated = false;
+                m_playerTrainingWrapper.ResetPlayerPosition();
+
                 m_emotivInterface.GetMCTrainedSignatureActions(k_ProfileName);
                 m_emotivInterface.GetMCBrainMap(k_ProfileName);
+                m_emotivInterface.SaveProfile(k_ProfileName);
                 break;
 
             case SystemEvent.MC_Rejected:
                 m_trainingUI.SetBaseState();
+                m_playerTrainingWrapper.ResetPlayerPosition();
                 break;
         }
     }
@@ -220,27 +259,28 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     private void ProcessTrainedSignatureActions(JObject result)
     {
         JArray trainedActions = result["trainedActions"].Value<JArray>();
-        
-        foreach (JToken trainedAction in trainedActions)
-        {
-            string actionName = trainedAction["action"].Value<string>();
 
-            if (actionName == m_actionNames[m_trainingUI.currentActionIndex])
+        for (int i = 0, l = trainedActions.Count; i < l; i++) 
+        {
+            string actionName = trainedActions[i]["action"].Value<string>();
+
+            if (!m_checkedSignatureActionOnLoad || actionName == m_actionNames[m_trainingUI.currentActionIndex]) 
             {
-                int skillLevel = trainedAction["times"].Value<int>();
+                int skillLevel = trainedActions[i]["times"].Value<int>();
 
                 m_signatureActionsDict[actionName] = skillLevel;
 
-                m_trainingUI.UpdateSkillLevel(skillLevel);
+                m_trainingUI.UpdateSkillLevel(i, skillLevel);
             }
         }
 
-        if (m_signatureActionsDict["neutral"] == 1)
+        if (m_signatureActionsDict["neutral"] >= 1)
         {
             m_trainingUI.EnableAllActions();
         }
 
-        m_signatureActionsUpdated = true;
+        if (!m_checkedSignatureActionOnLoad)
+            m_checkedSignatureActionOnLoad = true;
     }
 
     private void ProcessMentalCommandBrainMap(JArray result)
@@ -282,7 +322,7 @@ public class EmotivTrainingInterfacer : MonoBehaviour
             float lastTrainingScore = result["lastTrainingScore"].Value<float>();
 
             string actionName = m_actionNames[m_trainingUI.currentActionIndex];
-            if (m_signatureActionsDict[actionName] > 1)
+            if (m_signatureActionsDict.ContainsKey(actionName) && m_signatureActionsDict[actionName] > 1)
             {
                 m_trainingUI.EnableTrainingThresholdElement(currentThreshold, lastTrainingScore);
             }

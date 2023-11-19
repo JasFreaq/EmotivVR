@@ -53,7 +53,9 @@ namespace EmotivUnityPlugin
 
         public string MessageLog { get => _messageLog; set => _messageLog = value; }
 
-        public event EventHandler<SysEventArgs> SysEventsReceived;
+        public event Action<SysEventArgs> SysEventsReceived;
+        public event Action<MentalCommandEventArgs> MentalCommandReceived;
+
 
         /// <summary>
         /// Set up App configuration.
@@ -613,7 +615,7 @@ namespace EmotivUnityPlugin
             // show the system event to message log
             _messageLog = dataText;
 
-            SysEventsReceived(this, data);
+            SysEventsReceived(data);
         }
 
         private void OnMentalCommandReceived(object sender, MentalCommandEventArgs data)
@@ -621,6 +623,8 @@ namespace EmotivUnityPlugin
             string dataText = "com data: " + data.Act + ", power: " + data.Pow.ToString() + ", time " + data.Time.ToString();
             // print out data to console
             UnityEngine.Debug.Log(dataText);
+            
+            MentalCommandReceived(data);
         }
 
         private void OnFacialExpReceived(object sender, FacEventArgs data)
