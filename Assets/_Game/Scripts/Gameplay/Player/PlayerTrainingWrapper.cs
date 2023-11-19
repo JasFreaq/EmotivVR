@@ -8,14 +8,16 @@ public class PlayerTrainingWrapper : MonoBehaviour
 
     private Vector3 m_playerinitialPosition;
 
+    public bool IsPlayerLaserInput { set => m_playerController.IsPlayerLaserInput = value; }
+
     private void Start()
     {
         m_playerinitialPosition = m_playerController.transform.position;
     }
 
-    public void EnqueuePlayerInput(float input)
+    public void EnqueuePlayerMovementInput(float input)
     {
-        m_playerController.EnqueueInput(input);
+        m_playerController.EnqueueMovementInput(input);
     }
 
     public void ResetPlayerPosition()

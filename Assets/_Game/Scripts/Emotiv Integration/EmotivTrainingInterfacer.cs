@@ -200,7 +200,7 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     {
         if (data.Act == "pull")
         {
-            m_playerTrainingWrapper.EnqueuePlayerInput((float)data.Pow);
+            m_playerTrainingWrapper.EnqueuePlayerMovementInput((float)data.Pow);
         }
     }
 
