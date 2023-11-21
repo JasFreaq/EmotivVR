@@ -6,7 +6,7 @@ public class SatelliteHandler : MonoBehaviour
 {
     private Vector3Int m_spawnOffset;
     
-    private float m_initialAngle;
+    private float m_currentAngle;
 
     public Vector3Int SpawnOffset
     {
@@ -14,9 +14,9 @@ public class SatelliteHandler : MonoBehaviour
         set => m_spawnOffset = value;
     }
 
-    public float InitialAngle
+    public float CurrentAngle
     {
-        get => m_initialAngle;
-        set => m_initialAngle = value;
+        get => m_currentAngle;
+        set => m_currentAngle = value;
     }
 }
