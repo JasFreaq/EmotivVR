@@ -6,16 +6,18 @@ using UnityEngine.Windows;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float m_playerSpeed = 10f;
-    [SerializeField] private float m_laserTime = 3f;
+    [SerializeField] private float[] m_laserTimes;
     [SerializeField] private EyeLaserHandler m_eyeLaser;
 
     private Rigidbody m_rigidbody;
 
     private Queue<float> m_inputQueue = new Queue<float>();
-    
+
+    private float m_totalLaserTime;
+
     private float m_laserTimer;
 
-    [SerializeField] private bool m_isPlayerLaserInput;
+    private bool m_isPlayerLaserInput;
 
     public bool IsPlayerLaserInput { set => m_isPlayerLaserInput = value; }
 
@@ -24,24 +26,55 @@ public class PlayerController : MonoBehaviour
         m_rigidbody = GetComponent<Rigidbody>();
     }
 
+    private void Start()
+    {
+        foreach (float time in m_laserTimes)
+        {
+            m_totalLaserTime += time;
+        }
+    }
+
     private void Update()
     {
-        m_laserTimer = m_isPlayerLaserInput ? Mathf.Min(m_laserTimer + Time.deltaTime, m_laserTime) : Mathf.Max(m_laserTimer - Time.deltaTime, 0f);
+        m_laserTimer += Time.deltaTime * (m_isPlayerLaserInput ? 1f : -1f);
+        m_laserTimer = Mathf.Clamp(m_laserTimer, 0f, m_totalLaserTime);
         
         if (m_laserTimer <= Mathf.Epsilon)
         {
             if (m_eyeLaser.gameObject.activeSelf)
             {
-                m_eyeLaser.SetLaserScaling(0f);
+                m_eyeLaser.SetLaserScaling(0, 0f, 0f);
                 m_eyeLaser.gameObject.SetActive(false);
             }
         }
-        else
+        else if (m_laserTimer - Mathf.Epsilon < m_totalLaserTime)
         {
-            m_eyeLaser.SetLaserScaling(m_laserTimer - m_laserTime >= Mathf.Epsilon ? m_laserTime : m_laserTimer);
+            float upper = 0f, timeSpent = 0;
+            int l = m_laserTimes.Length;
+
+            for (int i = 0; i < l; i++)
+            {
+                float lower = i == 0 ? 0f : m_laserTimes[i - 1];
+                upper += m_laserTimes[i];
+
+                if (m_laserTimer - lower >= Mathf.Epsilon &&
+                    m_laserTimer - upper <= Mathf.Epsilon)
+                {
+                    m_eyeLaser.SetLaserScaling(i, (m_laserTimer - timeSpent) / m_laserTimes[i],
+                        m_laserTimer / m_totalLaserTime);
+
+                    break;
+                }
+
+                timeSpent = upper;
+            }
 
             if (!m_eyeLaser.gameObject.activeSelf)
                 m_eyeLaser.gameObject.SetActive(true);
+        }
+        else if (!m_eyeLaser.IsLaserFullyScaled)
+        {
+            m_eyeLaser.SetLaserScaling(m_laserTimes.Length - 1, 1f, 1f);
         }
     }
 
