@@ -5,8 +5,8 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
-using Vector2 = UnityEngine.Vector2;
 using TMPro;
+
 
 public class OrbitManager : MonoBehaviour
 {
@@ -44,20 +44,21 @@ public class OrbitManager : MonoBehaviour
 
         float satellitePerUnitTime = m_satelliteCount / totalGenerationTime;
 
+        float spawnTimeCounter = 0f;
+
         WaitForEndOfFrame waitForEndOfFrame = new WaitForEndOfFrame();
         yield return waitForEndOfFrame;
 
         while (generationTimer - Mathf.Epsilon <= totalGenerationTime)
         {
             generationTimer += Time.deltaTime;
+            spawnTimeCounter += satellitePerUnitTime * Time.deltaTime;
 
             HashSet<Vector3Int> satellitePositionsMap = new HashSet<Vector3Int>();
             List<SatelliteHandler> newSatellites = new List<SatelliteHandler>();
-
-            int shipsToGenerate = Mathf.RoundToInt(satellitePerUnitTime * Time.deltaTime);
-            int extraShips = (m_satelliteCount % shipsToGenerate) / (m_satelliteCount / shipsToGenerate);
-
-            shipsToGenerate += extraShips;
+            
+            int shipsToGenerate = Mathf.FloorToInt(spawnTimeCounter);
+            spawnTimeCounter -= shipsToGenerate;
 
             for (int i = 0; i < shipsToGenerate; i++)
             {
@@ -78,24 +79,23 @@ public class OrbitManager : MonoBehaviour
 
     private Vector3 GenerateRandomPointOnEllipse(HashSet<Vector3Int> satellitePositionsMap, SatelliteHandler satellite)
     {
-        Vector3Int randomPosition;
+        Vector3Int offsets = new Vector3Int();
 
         do
         {
-            int xOffset = Random.Range(-m_orbitMemberRange.x, m_orbitMemberRange.x + 1);
-            int yOffset = Random.Range(-m_orbitMemberRange.y, m_orbitMemberRange.y + 1);
-            int zOffset = Random.Range(-m_orbitMemberRange.z, m_orbitMemberRange.z + 1);
+            offsets.x = Random.Range(-m_orbitMemberRange.x, m_orbitMemberRange.x + 1);
+            offsets.y = Random.Range(-m_orbitMemberRange.y, m_orbitMemberRange.y + 1);
+            offsets.z = Random.Range(-m_orbitMemberRange.z, m_orbitMemberRange.z + 1);
+            
+        } while (satellitePositionsMap.Contains(offsets));
 
-            satellite.SpawnOffset = new Vector3Int(xOffset, yOffset, zOffset);
+        satellite.SpawnOffset = offsets;
+        satellitePositionsMap.Add(offsets);
 
-            int xPos = Mathf.RoundToInt(m_semiMajorAxis) + xOffset;
+        int xPos = Mathf.RoundToInt(m_semiMajorAxis) + offsets.x;
 
-            randomPosition = new Vector3Int(xPos, 0, zOffset) * m_orbitThicknessRange;
-
-        } while (satellitePositionsMap.Contains(randomPosition));
-
-        satellitePositionsMap.Add(randomPosition);
-
+        Vector3Int randomPosition = new Vector3Int(xPos, 0, offsets.z) * m_orbitThicknessRange;
+        
         return transform.position + Quaternion.FromToRotation(Vector3.forward, m_orbitNormal) * randomPosition;
     }
 
