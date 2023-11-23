@@ -6,6 +6,8 @@ using UnityEngine;
 
 public struct SatelliteData : IComponentData
 {
+    public Entity mTargetOrbit;
+
     public float3 mSpawnOffset;
 
     public float mCurrentAngle;

@@ -24,10 +24,11 @@ public partial struct SatelliteSpawnerSystem : ISystem
         float deltaTime = SystemAPI.Time.DeltaTime;
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
-
+        
         bool allOrbitsSpawned = true;
-
-        foreach ((RefRO<OrbitProperties> orbitProperties, Entity orbitEntity) in SystemAPI.Query<RefRO<OrbitProperties>>().WithEntityAccess())
+        
+        foreach ((RefRO<OrbitProperties> orbitProperties, Entity orbitEntity) in 
+                 SystemAPI.Query<RefRO<OrbitProperties>>().WithEntityAccess())
         {
             if (state.EntityManager.HasComponent<OrbitSpawnDataCache>(orbitEntity))
             {
@@ -42,22 +43,7 @@ public partial struct SatelliteSpawnerSystem : ISystem
                     orbitSpawnAspect.SpawnTimeCounter -= shipsToGenerate;
 
                     OrbitAspect orbitAspect = SystemAPI.GetAspect<OrbitAspect>(orbitEntity);
-
-                    BlobBuilder builder = new BlobBuilder(Allocator.Temp);
-                    ref OrbitSatellitesBlob orbitSatellitesBlob = ref builder.ConstructRoot<OrbitSatellitesBlob>();
-
-                    int orbitSatellitesCount = orbitAspect.OrbitSatellitesCount;
-                    BlobBuilderArray<Entity> builderArray = builder.Allocate(ref orbitSatellitesBlob.mOrbitSatellites,
-                            orbitSatellitesCount + shipsToGenerate);
-
-                    if (orbitSatellitesCount > 0)
-                    {
-                        for (int i = 0; i < orbitSatellitesCount; i++)
-                        {
-                            builderArray[i] = orbitAspect.GetOrbitSatellite(i);
-                        }
-                    }
-
+                    
                     for (int i = 0; i < shipsToGenerate; i++)
                     {
                         Entity satelliteEntity = commandBuffer.Instantiate(orbitAspect.SatellitePrefab);
@@ -74,21 +60,12 @@ public partial struct SatelliteSpawnerSystem : ISystem
 
                         SatelliteData satelliteData = new SatelliteData
                         {
+                            mTargetOrbit = orbitEntity,
                             mSpawnOffset = randomOffset,
                             mCurrentAngle = 0f
                         };
                         commandBuffer.AddComponent(satelliteEntity, satelliteData);
-
-                        builderArray[orbitSatellitesCount + i] = satelliteEntity;
                     }
-
-                    BlobAssetReference<OrbitSatellitesBlob> blobAsset = builder.CreateBlobAssetReference<OrbitSatellitesBlob>(Allocator.Persistent);
-                    commandBuffer.SetComponent(orbitEntity, new OrbitSatellites()
-                    {
-                        mOrbitSatellitesBlob = blobAsset,
-                        mOrbitSatellitesCount = orbitSatellitesCount + shipsToGenerate
-                    });
-                    builder.Dispose();
                 }
                 else
                 {

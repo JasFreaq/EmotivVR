@@ -71,10 +71,5 @@ public class OrbitBaker : Baker<OrbitMono>
             mSatellitePerUnitTime = authoring.SatelliteCount / (360f / authoring.SatelliteSpeed),
             mSpawnTimeCounter = 0
         });
-
-        AddComponent(orbitEntity, new OrbitSatellites
-        {
-            mOrbitSatellitesCount = 0
-        });
     }
 }
