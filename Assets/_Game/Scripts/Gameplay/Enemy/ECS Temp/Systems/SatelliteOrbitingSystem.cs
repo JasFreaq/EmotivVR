@@ -1,18 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst;
+using Unity.Entities;
 using UnityEngine;
 
-public class SatelliteOrbitingSystem : MonoBehaviour
+[BurstCompile]
+public partial struct SatelliteOrbitingSystem : ISystem
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
+    [BurstCompile]
+    public void OnUpdate(ref SystemState state)
     {
         
     }
 }
+
+

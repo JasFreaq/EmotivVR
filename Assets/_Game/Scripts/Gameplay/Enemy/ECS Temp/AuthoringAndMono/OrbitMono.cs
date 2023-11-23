@@ -25,7 +25,7 @@ public class OrbitMono : MonoBehaviour
 
     public float SemiMinorAxis => m_semiMinorAxis;
 
-    public int3 orbitMemberHalfRange => m_orbitMemberHalfRange;
+    public int3 OrbitMemberHalfRange => m_orbitMemberHalfRange;
 
     public float3 OrbitThicknessRange => m_orbitThicknessRange;
 
@@ -51,7 +51,7 @@ public class OrbitBaker : Baker<OrbitMono>
         {
             mSemiMajorAxis = authoring.SemiMajorAxis,
             mSemiMinorAxis = authoring.SemiMinorAxis,
-            mOrbitMemberRange = authoring.orbitMemberHalfRange,
+            mOrbitMemberHalfRange = authoring.OrbitMemberHalfRange,
             mOrbitThicknessRange = authoring.OrbitThicknessRange,
             mOrbitNormal = authoring.OrbitNormal,
             mSatellitePrefab = GetEntity(authoring.SatellitePrefab, TransformUsageFlags.Dynamic),
@@ -70,6 +70,11 @@ public class OrbitBaker : Baker<OrbitMono>
             mTotalGenerationTime = 360f / authoring.SatelliteSpeed,
             mSatellitePerUnitTime = authoring.SatelliteCount / (360f / authoring.SatelliteSpeed),
             mSpawnTimeCounter = 0
+        });
+
+        AddComponent(orbitEntity, new OrbitSatellites
+        {
+            mOrbitSatellitesCount = 0
         });
     }
 }

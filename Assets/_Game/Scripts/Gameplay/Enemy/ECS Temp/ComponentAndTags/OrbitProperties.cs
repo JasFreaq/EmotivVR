@@ -8,7 +8,7 @@ public struct OrbitProperties : IComponentData
 {
     public float mSemiMajorAxis;
     public float mSemiMinorAxis;
-    public int3 mOrbitMemberRange;
+    public int3 mOrbitMemberHalfRange;
     public float3 mOrbitThicknessRange;
     public float3 mOrbitNormal;
     

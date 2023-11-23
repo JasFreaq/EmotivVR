@@ -17,13 +17,15 @@ public readonly partial struct OrbitAspect : IAspect
 
     private readonly RefRW<OrbitRandom> m_orbitRandom;
 
+    private readonly RefRW<OrbitSatellites> m_orbitSatellites;
+
     private LocalTransform Transform => m_transform.ValueRO;
 
     public float SemiMajorAxis => m_orbitProperties.ValueRO.mSemiMajorAxis;
 
     public float SemiMinorAxis => m_orbitProperties.ValueRO.mSemiMinorAxis;
 
-    public int3 OrbitMemberRange => m_orbitProperties.ValueRO.mOrbitMemberRange;
+    public int3 OrbitMemberHalfRange => m_orbitProperties.ValueRO.mOrbitMemberHalfRange;
 
     public float3 OrbitThicknessRange => m_orbitProperties.ValueRO.mOrbitThicknessRange;
 
@@ -36,10 +38,17 @@ public readonly partial struct OrbitAspect : IAspect
     public int SatelliteCount => m_orbitProperties.ValueRO.mSatelliteCount;
 
     public Random OrbitRandomSeed => m_orbitRandom.ValueRO.mRand;
-    
+
+    public int OrbitSatellitesCount => m_orbitSatellites.ValueRO.mOrbitSatellitesCount;
+
+    public Entity GetOrbitSatellite(int index)
+    {
+        return m_orbitSatellites.ValueRO.mOrbitSatellitesBlob.Value.mOrbitSatellites[index];
+    }
+
     public float3 GetRandomOffset()
     {
-        float3 range = m_orbitProperties.ValueRO.mOrbitMemberRange;
+        float3 range = m_orbitProperties.ValueRO.mOrbitMemberHalfRange;
         float3 offset = m_orbitRandom.ValueRW.mRand.NextFloat3(-range, range);
 
         return offset;
