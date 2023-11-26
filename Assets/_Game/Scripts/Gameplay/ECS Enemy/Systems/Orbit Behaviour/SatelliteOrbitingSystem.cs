@@ -56,6 +56,8 @@ public partial struct SatelliteOrbitingJob : IJobEntity
     [BurstCompile]
     public void Execute(ref LocalTransform transform, ref SatelliteData satelliteData)
     {
+        
+
         if (mOrbitPropertiesLookup.TryGetComponent(satelliteData.mTargetOrbit, out OrbitProperties orbitProperties))
         {
             if (!mLocalToWorldLookup.HasComponent(satelliteData.mTargetOrbit))

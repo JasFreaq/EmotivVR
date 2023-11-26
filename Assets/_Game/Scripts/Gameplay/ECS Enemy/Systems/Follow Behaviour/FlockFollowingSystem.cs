@@ -49,7 +49,7 @@ public partial struct FlockFollowingJob : IJobEntity
             {
                 float elevation = math.acos(random.mRand.NextFloat(0, 2) - 1);
                 float azimuth = random.mRand.NextFloat(0, math.PI * 2);
-                Debug.Log($"Azi: {azimuth} Ele: {elevation}");
+
                 float x = flockFollower.mFollowRadius * math.sin(elevation) * math.cos(azimuth);
                 float y = flockFollower.mFollowRadius * math.sin(elevation) * math.sin(azimuth);
                 float z = flockFollower.mFollowRadius * math.cos(elevation);
