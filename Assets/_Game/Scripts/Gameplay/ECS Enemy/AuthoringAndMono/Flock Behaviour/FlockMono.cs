@@ -19,12 +19,17 @@ public class FlockMono : MonoBehaviour
 
     [Header("Birds")]
     [SerializeField] private float m_birdSpeed = 20f;
+    [SerializeField] private float m_birdAttackRange = 75f;
     [SerializeField] private GameObject m_birdPrefab;
 
-    [Header("Follow Parameters")]
-    [SerializeField] private float m_followRadius = 25f;
-    [SerializeField] private float m_birdsProximityForUpdate = 10f;
-    [SerializeField] private float m_newDestinationInvalidityRadius = 10f;
+    [Header("Missile")]
+    [SerializeField] private int m_rocketsFiredPerPatrol = 3;
+    [SerializeField] private float m_rocketsFiredPerSecond = 2;
+
+    [Header("Follow")]
+    [SerializeField] private float m_followRadius = 100f;
+    [SerializeField] private float m_birdsProximityForUpdate = 25f;
+    [SerializeField] private float m_newDestinationInvalidityRadius = 60f;
 
     public int FlockSize => m_flockSize;
     
@@ -36,19 +41,25 @@ public class FlockMono : MonoBehaviour
     
     public float SeekWeight => m_seekWeight;
 
+    public float BirdSpeed => m_birdSpeed;
+    
+    public float BirdAttackRange => m_birdAttackRange;
+
     public GameObject BirdPrefab => m_birdPrefab;
 
-    public float BirdSpeed => m_birdSpeed;
+    public int RocketsFiredPerPatrol => m_rocketsFiredPerPatrol;
+    
+    public float RocketsFiredPerSecond => m_rocketsFiredPerSecond;
+
+    public float FollowRadius => m_followRadius;
+
+    public float BirdsProximityForUpdate => m_birdsProximityForUpdate;
+
+    public float NewDestinationInvalidityRadius => m_newDestinationInvalidityRadius;
 
     public uint FlockSpawnRandomSeed => m_flockSpawnRandomSeed;
     
     public uint FlockUpdateRandomSeed => m_flockUpdateRandomSeed;
-
-    public float FollowRadius => m_followRadius;
-    
-    public float BirdsProximityForUpdate => m_birdsProximityForUpdate;
-    
-    public float NewDestinationInvalidityRadius => m_newDestinationInvalidityRadius;
 }
 
 public class FlockBaker : Baker<FlockMono>
@@ -62,7 +73,10 @@ public class FlockBaker : Baker<FlockMono>
             mFlockSize = authoring.FlockSize,
             mSeparationRadius = authoring.SeparationRadius,
             mSeekWeight = authoring.SeekWeight,
-            mFlockSpeed = authoring.BirdSpeed
+            mBirdSpeed = authoring.BirdSpeed,
+            mBirdAttackRange = authoring.BirdAttackRange,
+            mRocketsPerPatrol = authoring.RocketsFiredPerPatrol,
+            mFireRateTime = 1 / authoring.RocketsFiredPerSecond
         });
 
         AddComponent(flockEntity,new FlockFollower

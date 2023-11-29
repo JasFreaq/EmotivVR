@@ -23,7 +23,7 @@ public class OrbitMono : MonoBehaviour
     [SerializeField] private int m_satelliteCount = 100;
 
     [Header("Missile")] 
-    [SerializeField] private int m_missilesFiredPerSecond = 4;
+    [SerializeField] private int m_lasersFiredPerSecond = 4;
 
     [Header("Follow")] 
     [SerializeField] private float m_followSpeed = 10f;
@@ -48,7 +48,7 @@ public class OrbitMono : MonoBehaviour
 
     public int SatelliteCount => m_satelliteCount;
     
-    public int MissilesFiredPerSecond => m_missilesFiredPerSecond;
+    public int LasersFiredPerSecond => m_lasersFiredPerSecond;
 
     public float FollowSpeed => m_followSpeed;
 }
@@ -65,7 +65,8 @@ public class OrbitBaker : Baker<OrbitMono>
             mSemiMinorAxis = authoring.SemiMinorAxis,
             mOrbitThicknessBounds = authoring.OrbitThicknessBounds,
             mOrbitNormal = authoring.OrbitNormal,
-            mSatelliteSpeed = authoring.SatelliteSpeed
+            mSatelliteSpeed = authoring.SatelliteSpeed,
+            mFireRateTime = 1f / authoring.LasersFiredPerSecond,
         });
         
         AddComponent(orbitEntity, new OrbitFollower
@@ -86,7 +87,6 @@ public class OrbitBaker : Baker<OrbitMono>
 
         AddComponent(orbitEntity, new OrbitUpdateData
         {
-            mFireRateTime = 1f / authoring.MissilesFiredPerSecond,
             mOrbitSatelliteCount = authoring.SatelliteCount,
             mRand = Random.CreateFromIndex(authoring.OrbitUpdateRandomSeed)
         });

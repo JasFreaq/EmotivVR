@@ -7,7 +7,12 @@ using UnityEngine;
 public struct FlockProperties : IComponentData
 {
     public int mFlockSize;
-    public float mFlockSpeed;
+
+    public float mBirdSpeed;
+    public float mBirdAttackRange;
+
+    public int mRocketsPerPatrol;
+    public float mFireRateTime;
     
     public float mSeparationRadius;
     public float mSeekWeight;

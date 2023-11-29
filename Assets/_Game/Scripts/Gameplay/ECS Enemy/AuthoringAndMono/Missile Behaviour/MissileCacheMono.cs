@@ -41,6 +41,8 @@ public class MissileCacheBaker : Baker<MissileCacheMono>
 
         AddComponent<MissileLaserElement>(missileCacheEntity);
 
+        AddComponent<MissileRocketElement>(missileCacheEntity);
+
         AddComponent(missileCacheEntity, new MissileRandomUtility
         {
             mRand = Random.CreateFromIndex(authoring.RandomMissileSeed)

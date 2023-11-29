@@ -9,7 +9,9 @@ public readonly partial struct MissileCacheAspect : IAspect
 
     private readonly RefRO<MissileCache> m_missileCache;
 
-    private readonly DynamicBuffer<MissileLaserElement> m_LaserPrefabsBuffer;
+    private readonly DynamicBuffer<MissileLaserElement> m_laserPrefabsBuffer;
+    
+    private readonly DynamicBuffer<MissileRocketElement> m_rocketPrefabsBuffer;
 
     private readonly RefRW<MissileRandomUtility> m_missileRandom;
 
@@ -23,9 +25,17 @@ public readonly partial struct MissileCacheAspect : IAspect
 
     public Entity GetRandomLaser()
     {
-        int laserPrefabsLength = m_LaserPrefabsBuffer.Length;
+        int laserPrefabsLength = m_laserPrefabsBuffer.Length;
         int index = m_missileRandom.ValueRW.mRand.NextInt(laserPrefabsLength);
 
-        return m_LaserPrefabsBuffer[index].mLaserPrefab;
+        return m_laserPrefabsBuffer[index].mLaserPrefab;
+    }
+    
+    public Entity GetRandomRocket()
+    {
+        int rocketPrefabsLength = m_rocketPrefabsBuffer.Length;
+        int index = m_missileRandom.ValueRW.mRand.NextInt(rocketPrefabsLength);
+
+        return m_rocketPrefabsBuffer[index].mRocketPrefab;
     }
 }

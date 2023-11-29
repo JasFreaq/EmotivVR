@@ -9,6 +9,7 @@ using UnityEngine;
 
 [BurstCompile]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
+[UpdateAfter(typeof(SatelliteOrbitingSystem))]
 public partial struct LaserLocomotionSystem : ISystem
 {
     [BurstCompile]
@@ -30,7 +31,6 @@ public partial struct LaserLocomotionSystem : ISystem
             mDeltaTime = SystemAPI.Time.DeltaTime,
             mSpeed = missileCacheAspect.LaserSpeed,
             mParallelCommandBuffer = commandBuffer.AsParallelWriter()
-
         };
 
         state.Dependency = laserLocomotionJob.ScheduleParallel(state.Dependency);

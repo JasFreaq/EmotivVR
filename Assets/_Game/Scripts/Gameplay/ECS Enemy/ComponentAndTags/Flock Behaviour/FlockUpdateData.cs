@@ -10,5 +10,11 @@ public struct FlockUpdateData : IComponentData
 {
     public float mClosestBirdDistance;
 
+    public int mRocketsFired;
+
+    public float mLastFireTime;
+
+    public float mFireTimer;
+
     public Random mRand;
 }

@@ -5,8 +5,6 @@ using Random = Unity.Mathematics.Random;
 
 public struct OrbitUpdateData : IComponentData
 {
-    public float mFireRateTime;
-
     public float mLastFireTime;
     
     public float mFireTimer;

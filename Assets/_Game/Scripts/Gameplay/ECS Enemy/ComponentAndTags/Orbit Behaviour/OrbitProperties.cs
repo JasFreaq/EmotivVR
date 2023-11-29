@@ -14,4 +14,6 @@ public struct OrbitProperties : IComponentData
     public float3 mOrbitNormal;
     
     public float mSatelliteSpeed;
+
+    public float mFireRateTime;
 }

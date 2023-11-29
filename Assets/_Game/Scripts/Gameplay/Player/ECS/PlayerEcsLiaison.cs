@@ -9,7 +9,7 @@ public class PlayerEcsLiaison : MonoBehaviour
     private EntityQuery m_positionQuery;
     private EntityQuery m_cameraQuery;
 
-    public bool m_addedCameraDetails;
+    private bool m_addedCameraDetails;
 
     private void Start()
     {

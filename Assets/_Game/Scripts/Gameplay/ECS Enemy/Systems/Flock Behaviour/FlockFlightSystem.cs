@@ -24,9 +24,27 @@ public partial struct FlockFlightSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        foreach (RefRW<FlockUpdateData> flockUpdateData in SystemAPI.Query<RefRW<FlockUpdateData>>())
+        {
+            flockUpdateData.ValueRW.mFireTimer += SystemAPI.Time.DeltaTime;
+        }
+
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
+        MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
+
+        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
+        PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
+
+        EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
+
         FlockFlightJob job = new FlockFlightJob
         {
             mDeltaTime = SystemAPI.Time.DeltaTime,
+            mTime = (float)SystemAPI.Time.ElapsedTime,
+            mRocketLifetime = missileCacheAspect.RocketLifetime,
+            mRocketEntity = missileCacheAspect.GetRandomRocket(),
+            mPlayerPosition = playerAspect.Transform.Position,
+            mParallelCommandBuffer = commandBuffer.AsParallelWriter(),
             mLocalToWorldLookup = state.GetComponentLookup<LocalToWorld>(true),
             mFlockPropertiesLookup = state.GetComponentLookup<FlockProperties>(true),
             mBirdLookup = state.GetBufferLookup<FlockBirdElement>(true),
@@ -34,6 +52,10 @@ public partial struct FlockFlightSystem : ISystem
         };
         
         state.Dependency = job.ScheduleParallel(state.Dependency);
+        state.Dependency.Complete();
+
+        commandBuffer.Playback(state.EntityManager);
+        commandBuffer.Dispose();
     }
 }
 
@@ -41,7 +63,18 @@ public partial struct FlockFlightSystem : ISystem
 public partial struct FlockFlightJob : IJobEntity
 {
     public float mDeltaTime;
-    
+
+    public float mTime;
+
+    public float mRocketLifetime;
+
+    public Entity mRocketEntity;
+
+    [ReadOnly]
+    public float3 mPlayerPosition;
+
+    public EntityCommandBuffer.ParallelWriter mParallelCommandBuffer;
+
     [ReadOnly]
     public ComponentLookup<LocalToWorld> mLocalToWorldLookup;
 
@@ -62,12 +95,14 @@ public partial struct FlockFlightJob : IJobEntity
             if (!mFlockUpdateDataLookup.HasComponent(birdData.mOwningFlock))
                 return;
 
+            RefRW<FlockUpdateData> flockUpdate = mFlockUpdateDataLookup.GetRefRW(birdData.mOwningFlock);
+
             float3 targetPosition = mLocalToWorldLookup.GetRefRO(birdData.mOwningFlock).ValueRO.Position;
 
             float distanceToTarget = math.distance(targetPosition, transform.Position);
 
-            if (distanceToTarget < mFlockUpdateDataLookup.GetRefRO(birdData.mOwningFlock).ValueRO.mClosestBirdDistance)
-                mFlockUpdateDataLookup.GetRefRW(birdData.mOwningFlock).ValueRW.mClosestBirdDistance = distanceToTarget;
+            if (distanceToTarget < flockUpdate.ValueRO.mClosestBirdDistance)
+                flockUpdate.ValueRW.mClosestBirdDistance = distanceToTarget;
             
             DynamicBuffer<FlockBirdElement> flockMembers = mBirdLookup[birdData.mOwningFlock];
 
@@ -104,10 +139,44 @@ public partial struct FlockFlightJob : IJobEntity
             velocity += seekDirection * flockProperties.mSeekWeight;
 
             physicsVelocity.Linear = math.normalizesafe(velocity)
-                                             * math.min(math.length(velocity), flockProperties.mFlockSpeed);
+                                             * math.min(math.length(velocity), flockProperties.mBirdSpeed);
 
-            quaternion rotation = quaternion.LookRotationSafe(math.normalizesafe(velocity), transform.Up());
+            quaternion rotation = quaternion.LookRotationSafe(math.normalizesafe(seekDirection), transform.Up());
             transform.Rotation = math.slerp(transform.Rotation, rotation, mDeltaTime);
+            
+            if (math.distance(transform.Position, mPlayerPosition) <= flockProperties.mBirdAttackRange) 
+            {
+                SpawnRockets(transform, flockProperties.mFireRateTime, sortKey, flockUpdate, flockProperties);
+            }
+        }
+    }
+
+    private void SpawnRockets(LocalTransform transform, float fireRateTime, int sortKey, RefRW<FlockUpdateData> flockUpdate, FlockProperties flockProperties)
+    {
+        float lastFireTime = flockUpdate.ValueRO.mLastFireTime;
+        float fireTimer = flockUpdate.ValueRO.mFireTimer;
+
+        if (fireTimer - lastFireTime >= fireRateTime &&
+            flockUpdate.ValueRO.mRocketsFired < flockProperties.mRocketsPerPatrol)
+        {
+            Entity rocketEntity = mParallelCommandBuffer.Instantiate(sortKey, mRocketEntity);
+
+            LocalTransform spawnTransform = new LocalTransform
+            {
+                Position = transform.Position,
+                Rotation = transform.Rotation,
+                Scale = 1f
+            };
+            mParallelCommandBuffer.SetComponent(sortKey, rocketEntity, spawnTransform);
+
+            RocketData rocketData = new RocketData
+            {
+                mLifetimeCounter = mRocketLifetime
+            };
+            mParallelCommandBuffer.AddComponent(sortKey, rocketEntity, rocketData);
+
+            flockUpdate.ValueRW.mRocketsFired++;
+            flockUpdate.ValueRW.mLastFireTime = mTime;
         }
     }
 }

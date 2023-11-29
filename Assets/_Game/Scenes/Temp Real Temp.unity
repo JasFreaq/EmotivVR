@@ -184,10 +184,7 @@ MonoBehaviour:
   flockSize: 50
   flock: []
   target: {fileID: 632770484}
-  cohesionRadius: 5
   separationRadius: 3
-  cohesionWeight: 1
-  separationWeight: 0.08
   seekWeight: 5
   maxSpeed: 5
 --- !u!1 &1644548275

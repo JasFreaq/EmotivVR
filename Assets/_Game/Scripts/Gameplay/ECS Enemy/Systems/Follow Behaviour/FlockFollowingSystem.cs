@@ -40,7 +40,6 @@ public partial struct FlockFollowingJob : IJobEntity
     [BurstCompile]
     public void Execute(ref LocalTransform transform, in FlockFollower flockFollower, ref FlockUpdateData flockUpdate)
     {
-
         if (flockUpdate.mClosestBirdDistance - float.Epsilon <= flockFollower.mBirdsProximityForUpdate) 
         {
             float3 updatedPosition;
@@ -60,7 +59,8 @@ public partial struct FlockFollowingJob : IJobEntity
                      flockFollower.mNewDestinationInvalidityRadius);
 
             flockUpdate.mClosestBirdDistance = float.MaxValue;
-                transform.Position = updatedPosition;
+            flockUpdate.mRocketsFired = 0;
+            transform.Position = updatedPosition;
         }
     }
 }

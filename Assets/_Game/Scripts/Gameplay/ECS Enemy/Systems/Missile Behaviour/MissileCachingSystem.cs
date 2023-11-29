@@ -18,15 +18,25 @@ public partial struct MissileCachingSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileRandomUtility>();
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
         
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         
         foreach((RefRO<MissileCacheData> missileCacheData, Entity missileCacheDataEntity) in 
                 SystemAPI.Query<RefRO<MissileCacheData>>().WithEntityAccess())
         {
-            DynamicBuffer<MissileLaserElement> buffer = SystemAPI.GetBuffer<MissileLaserElement>(missileCacheEntity);
-            buffer.Add(missileCacheData.ValueRO.mPrefab);
+            switch (missileCacheData.ValueRO.mMissileType)
+            {
+                case MissileType.Laser:
+                    DynamicBuffer<MissileLaserElement> laserBuffer = SystemAPI.GetBuffer<MissileLaserElement>(missileCacheEntity);
+                    laserBuffer.Add(missileCacheData.ValueRO.mPrefab);
+                    break;
+
+                case MissileType.Rocket:
+                    DynamicBuffer<MissileRocketElement> rocketBuffer = SystemAPI.GetBuffer<MissileRocketElement>(missileCacheEntity);
+                    rocketBuffer.Add(missileCacheData.ValueRO.mPrefab);
+                    break;
+            }
 
             commandBuffer.DestroyEntity(missileCacheDataEntity);
         }

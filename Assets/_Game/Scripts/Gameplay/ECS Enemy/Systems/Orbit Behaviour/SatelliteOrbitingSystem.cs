@@ -29,7 +29,7 @@ public partial struct SatelliteOrbitingSystem : ISystem
             orbitUpdateData.ValueRW.mFireTimer += SystemAPI.Time.DeltaTime;
         }
 
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileRandomUtility>();
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
         MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
 
         Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
@@ -124,7 +124,12 @@ public partial struct SatelliteOrbitingJob : IJobEntity
 
             if (IsSatelliteInView(transform))
             {
-                SpawnLasers(sortKey, satelliteData, smoothedPosition, upDirection, lookDirection);
+                if (!mOrbitUpdateDataLookup.HasComponent(satelliteData.mTargetOrbit))
+                    return;
+
+                RefRW<OrbitUpdateData> orbitUpdate = mOrbitUpdateDataLookup.GetRefRW(satelliteData.mTargetOrbit);
+
+                SpawnLasers(orbitProperties.mFireRateTime, sortKey, orbitUpdate, smoothedPosition, upDirection, lookDirection);
             }
         }
     }
@@ -149,19 +154,15 @@ public partial struct SatelliteOrbitingJob : IJobEntity
     }
 
     [BurstCompile]
-    private void SpawnLasers(int sortKey, SatelliteData satelliteData, float3 smoothedPosition, float3 upDirection, float3 lookDirection)
+    private void SpawnLasers(float fireRateTime, int sortKey, RefRW<OrbitUpdateData> orbitUpdate, float3 smoothedPosition, float3 upDirection, float3 lookDirection)
     {
-        if (!mOrbitUpdateDataLookup.HasComponent(satelliteData.mTargetOrbit))
-            return;
+        float lastFireTime = orbitUpdate.ValueRO.mLastFireTime;
+        float fireTimer = orbitUpdate.ValueRO.mFireTimer;
 
-        float lastFireTime = mOrbitUpdateDataLookup.GetRefRO(satelliteData.mTargetOrbit).ValueRO.mLastFireTime;
-        float fireTimer = mOrbitUpdateDataLookup.GetRefRO(satelliteData.mTargetOrbit).ValueRO.mFireTimer;
-
-        if (fireTimer - lastFireTime >=
-            mOrbitUpdateDataLookup.GetRefRO(satelliteData.mTargetOrbit).ValueRO.mFireRateTime)
+        if (fireTimer - lastFireTime >= fireRateTime)
         {
-            float fireChance = mOrbitUpdateDataLookup.GetRefRW(satelliteData.mTargetOrbit).ValueRW.mRand.NextFloat();
-            int satelliteCount = mOrbitUpdateDataLookup.GetRefRO(satelliteData.mTargetOrbit).ValueRO.mOrbitSatelliteCount;
+            float fireChance = orbitUpdate.ValueRW.mRand.NextFloat();
+            int satelliteCount = orbitUpdate.ValueRO.mOrbitSatelliteCount;
 
             if (fireChance < 1f / satelliteCount)
             {
@@ -174,14 +175,14 @@ public partial struct SatelliteOrbitingJob : IJobEntity
                     Scale = 1f
                 };
                 mParallelCommandBuffer.SetComponent(sortKey, laserEntity, spawnTransform);
-
+                
                 LaserData laserData = new LaserData
                 {
                     mLifetimeCounter = mLaserLifetime
                 };
                 mParallelCommandBuffer.AddComponent(sortKey, laserEntity, laserData);
 
-                mOrbitUpdateDataLookup.GetRefRW(satelliteData.mTargetOrbit).ValueRW.mLastFireTime = mTime;
+                orbitUpdate.ValueRW.mLastFireTime = mTime;
             }
         }
     }

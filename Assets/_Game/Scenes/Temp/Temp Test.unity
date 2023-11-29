@@ -123,6 +123,51 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &286023555
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 286023557}
+  - component: {fileID: 286023556}
+  m_Layer: 0
+  m_Name: Particles Cache
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &286023556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286023555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea4edb408857541419fd0bf455d378e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_tinyExplosionParticle: {fileID: 198175801688348628, guid: 25c7aa9ad705fe143a4d71c1c8deb7d4, type: 3}
+--- !u!4 &286023557
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286023555}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &733200291
 GameObject:
   m_ObjectHideFlags: 0
@@ -134,7 +179,7 @@ GameObject:
   - component: {fileID: 733200292}
   - component: {fileID: 733200293}
   m_Layer: 0
-  m_Name: Cache Data
+  m_Name: Laser Cache
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -180,7 +225,7 @@ GameObject:
   - component: {fileID: 943504668}
   - component: {fileID: 943504669}
   m_Layer: 0
-  m_Name: Cache Data (1)
+  m_Name: Laser Cache (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -215,6 +260,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_laserPrefab: {fileID: 8051967695340887395, guid: a6739994498910a47999b10767201b19, type: 3}
   m_missileType: 0
+--- !u!1 &963327879
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 963327880}
+  - component: {fileID: 963327881}
+  m_Layer: 0
+  m_Name: Rocket Cache
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &963327880
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963327879}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1882427542}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &963327881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963327879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e220ebd02e27244a3ceabcd6daf1e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_laserPrefab: {fileID: 4012358715608612755, guid: 851bd223c3a5ae04883be4a3caaae147, type: 3}
+  m_missileType: 1
 --- !u!1 &1292304107
 GameObject:
   m_ObjectHideFlags: 0
@@ -226,7 +317,7 @@ GameObject:
   - component: {fileID: 1292304108}
   - component: {fileID: 1292304109}
   m_Layer: 0
-  m_Name: Cache Data (3)
+  m_Name: Laser Cache (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -277,7 +368,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1374748834
 Transform:
   m_ObjectHideFlags: 0
@@ -324,7 +415,7 @@ MonoBehaviour:
   m_satellitePrefab: {fileID: 4695566560236114868, guid: fcd273f4e56e675458a5dc4db04e9bf1, type: 3}
   m_satelliteSpeed: 60
   m_satelliteCount: 500
-  m_missilesFiredPerSecond: 4
+  m_lasersFiredPerSecond: 4
   m_followSpeed: 10
 --- !u!1 &1630682616
 GameObject:
@@ -382,7 +473,7 @@ GameObject:
   - component: {fileID: 1657086258}
   - component: {fileID: 1657086259}
   m_Layer: 0
-  m_Name: Cache Data (2)
+  m_Name: Laser Cache (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -451,6 +542,7 @@ Transform:
   - {fileID: 943504668}
   - {fileID: 1657086258}
   - {fileID: 1292304108}
+  - {fileID: 963327880}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1882427543
@@ -467,7 +559,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_laserLifetime: 8
   m_laserSpeed: 8
-  m_rocketLifetime: 10
+  m_rocketLifetime: 15
   m_rocketSpeed: 5
   m_randomMissileSeed: 251
 --- !u!1 &2003462561
@@ -513,7 +605,10 @@ MonoBehaviour:
   m_flockSpawnRandomSeed: 101
   m_flockUpdateRandomSeed: 201
   m_birdSpeed: 20
+  m_birdAttackRange: 75
   m_birdPrefab: {fileID: 1418792802177899192, guid: c301d521666552d49ae47ab44e9dc28f, type: 3}
+  m_rocketsFiredPerPatrol: 3
+  m_rocketsFiredPerSecond: 2
   m_followRadius: 100
   m_birdsProximityForUpdate: 25
   m_newDestinationInvalidityRadius: 60
@@ -526,7 +621,7 @@ Transform:
   m_GameObject: {fileID: 2003462561}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.56}
+  m_LocalPosition: {x: 100, y: 0, z: 0.56}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -623,3 +718,4 @@ SceneRoots:
   - {fileID: 2003462563}
   - {fileID: 1630682618}
   - {fileID: 1882427542}
+  - {fileID: 286023557}
