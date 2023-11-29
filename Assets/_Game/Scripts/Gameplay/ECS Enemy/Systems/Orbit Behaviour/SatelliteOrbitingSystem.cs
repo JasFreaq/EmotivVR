@@ -43,12 +43,14 @@ public partial struct SatelliteOrbitingSystem : ISystem
             mTime = (float)SystemAPI.Time.ElapsedTime,
             mLaserLifetime = missileCacheAspect.LaserLifetime,
             mLaserEntity = missileCacheAspect.GetRandomLaser(),
+            mParticlesCacheEntity = SystemAPI.GetSingletonEntity<ParticlesCache>(),
             mPlayerTransform = playerAspect.Transform,
             mCameraProperties = playerAspect.CameraProperties,
-            mParallelCommandBuffer = commandBuffer.AsParallelWriter(),
             mLocalToWorldLookup = state.GetComponentLookup<LocalToWorld>(true),
             mOrbitPropertiesLookup = state.GetComponentLookup<OrbitProperties>(true),
-            mOrbitUpdateDataLookup = state.GetComponentLookup<OrbitUpdateData>()
+            mOrbitUpdateDataLookup = state.GetComponentLookup<OrbitUpdateData>(),
+            mParticleSpawnBuffer = SystemAPI.GetBufferLookup<ParticleSpawnElement>(),
+            mParallelCommandBuffer = commandBuffer.AsParallelWriter()
         };
 
         state.Dependency = job.ScheduleParallel(state.Dependency);
@@ -70,14 +72,14 @@ public partial struct SatelliteOrbitingJob : IJobEntity
 
     public Entity mLaserEntity;
 
+    public Entity mParticlesCacheEntity;
+
     [ReadOnly] 
     public LocalTransform mPlayerTransform;
 
     [ReadOnly]
     public PlayerCameraProperties mCameraProperties;
-
-    public EntityCommandBuffer.ParallelWriter mParallelCommandBuffer;
-
+    
     [ReadOnly]
     public ComponentLookup<LocalToWorld> mLocalToWorldLookup;
 
@@ -87,9 +89,26 @@ public partial struct SatelliteOrbitingJob : IJobEntity
     [NativeDisableParallelForRestriction]
     public ComponentLookup<OrbitUpdateData> mOrbitUpdateDataLookup;
 
+    [NativeDisableParallelForRestriction]
+    public BufferLookup<ParticleSpawnElement> mParticleSpawnBuffer;
+
+    public EntityCommandBuffer.ParallelWriter mParallelCommandBuffer;
+
     [BurstCompile]
-    public void Execute(ref LocalTransform transform, [ChunkIndexInQuery] int sortKey, ref SatelliteData satelliteData)
+    public void Execute(ref LocalTransform transform, [ChunkIndexInQuery] int sortKey, in Entity entity, ref SatelliteData satelliteData)
     {
+        if (satelliteData.mMarkedToDestroy)
+        {
+            if (mOrbitUpdateDataLookup.HasComponent(satelliteData.mTargetOrbit))
+            {
+                mOrbitUpdateDataLookup.GetRefRW(satelliteData.mTargetOrbit).ValueRW.mOrbitSatelliteCount--;
+            }
+
+            SpawnExplosion(transform);
+            mParallelCommandBuffer.DestroyEntity(sortKey, entity);
+            return;
+        }
+
         if (mOrbitPropertiesLookup.TryGetComponent(satelliteData.mTargetOrbit, out OrbitProperties orbitProperties))
         {
             if (!mLocalToWorldLookup.HasComponent(satelliteData.mTargetOrbit))
@@ -184,6 +203,19 @@ public partial struct SatelliteOrbitingJob : IJobEntity
 
                 orbitUpdate.ValueRW.mLastFireTime = mTime;
             }
+        }
+    }
+
+    [BurstCompile]
+    private void SpawnExplosion(LocalTransform transform)
+    {
+        if (mParticleSpawnBuffer.HasBuffer(mParticlesCacheEntity))
+        {
+            mParticleSpawnBuffer[mParticlesCacheEntity].Add(new ParticleSpawnElement
+            {
+                mSpawnPosition = transform.Position,
+                mSpawnRotation = transform.Rotation
+            });
         }
     }
 }

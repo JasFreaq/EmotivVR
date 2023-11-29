@@ -25,5 +25,7 @@ public class ParticlesCacheBaker : Baker<ParticlesCacheMono>
             mTinyExplosionParticle = GetEntity(authoring.TinyExplosionParticle, TransformUsageFlags.Dynamic),
             mTinyExplosionLifetime = authoring.TinyExplosionLifetime
         });
+
+        AddComponent<ParticleSpawnElement>(particlesCacheEntity);
     }
 }

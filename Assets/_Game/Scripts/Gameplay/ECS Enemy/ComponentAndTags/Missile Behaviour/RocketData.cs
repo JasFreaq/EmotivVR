@@ -8,4 +8,6 @@ public struct RocketData : IComponentData
     public float mLifetimeCounter;
 
     public bool mMarkedToDestroy;
+
+    public bool mSpawnedExplosion;
 }

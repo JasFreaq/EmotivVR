@@ -6,4 +6,6 @@ using UnityEngine;
 public struct LaserData : IComponentData
 {
     public float mLifetimeCounter;
+
+    public bool mMarkedToDestroy;
 }

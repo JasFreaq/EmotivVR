@@ -6,6 +6,8 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static UnityEngine.EventSystems.EventTrigger;
 
 [BurstCompile]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
@@ -21,24 +23,21 @@ public partial struct RocketLocomotionSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileRandomUtility>();
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
         MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
 
         Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
-
-        Entity particlesCacheEntity = SystemAPI.GetSingletonEntity<ParticlesCache>();
-        ParticlesCacheAspect particlesCacheAspect = SystemAPI.GetAspect<ParticlesCacheAspect>(particlesCacheEntity);
-
+        
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         RocketLocomotionJob rocketLocomotionJob = new RocketLocomotionJob
         {
             mDeltaTime = SystemAPI.Time.DeltaTime,
             mSpeed = missileCacheAspect.RocketSpeed,
-            mExplosionLifetime = particlesCacheAspect.TinyExplosionLifetime,
             mPlayerPosition = playerAspect.Transform.Position,
-            mExplosionParticles = particlesCacheAspect.TinyExplosion,
+            mParticlesCacheEntity = SystemAPI.GetSingletonEntity<ParticlesCache>(),
+            mParticleSpawnBuffer = SystemAPI.GetBufferLookup<ParticleSpawnElement>(),
             mParallelCommandBuffer = commandBuffer.AsParallelWriter()
         };
 
@@ -56,12 +55,13 @@ public partial struct RocketLocomotionJob : IJobEntity
     public float mDeltaTime;
 
     public float mSpeed;
-
-    public float mExplosionLifetime;
-
+    
     public float3 mPlayerPosition;
     
-    public Entity mExplosionParticles;
+    public Entity mParticlesCacheEntity;
+
+    [NativeDisableParallelForRestriction]
+    public BufferLookup<ParticleSpawnElement> mParticleSpawnBuffer;
 
     public EntityCommandBuffer.ParallelWriter mParallelCommandBuffer;
     
@@ -71,6 +71,7 @@ public partial struct RocketLocomotionJob : IJobEntity
     {
         if (rocketData.mMarkedToDestroy)
         {
+            SpawnExplosion(transform);
             mParallelCommandBuffer.DestroyEntity(sortKey, entity);
             return;
         }
@@ -89,23 +90,21 @@ public partial struct RocketLocomotionJob : IJobEntity
         }
         else
         {
-            Entity particlesEntity = mParallelCommandBuffer.Instantiate(sortKey, mExplosionParticles);
-            
-            LocalTransform spawnTransform = new LocalTransform
-            {
-                Position = transform.Position,
-                Rotation = transform.Rotation,
-                Scale = 1f
-            };
-            mParallelCommandBuffer.SetComponent(sortKey, particlesEntity, spawnTransform);
-            
-            ParticleUpdateData particleUpdate = new ParticleUpdateData
-            {
-                mParticleLifetimeCounter = mExplosionLifetime
-            };
-            mParallelCommandBuffer.AddComponent(sortKey, particlesEntity, particleUpdate);
+            SpawnExplosion(transform);
+            mParallelCommandBuffer.DestroyEntity(sortKey, entity);
+        }
+    }
 
-            rocketData.mMarkedToDestroy = true;
+    [BurstCompile]
+    private void SpawnExplosion(LocalTransform transform)
+    {
+        if (mParticleSpawnBuffer.HasBuffer(mParticlesCacheEntity))
+        {
+            mParticleSpawnBuffer[mParticlesCacheEntity].Add(new ParticleSpawnElement
+            {
+                mSpawnPosition = transform.Position,
+                mSpawnRotation = transform.Rotation
+            });
         }
     }
 }

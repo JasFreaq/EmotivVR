@@ -11,4 +11,8 @@ public struct SatelliteData : IComponentData
     public float3 mSpawnOffset;
 
     public float mCurrentAngle;
+
+    public bool mMarkedToDestroy;
+    
+    public bool mSpawnedExplosion;
 }

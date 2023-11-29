@@ -44,11 +44,13 @@ public partial struct FlockFlightSystem : ISystem
             mRocketLifetime = missileCacheAspect.RocketLifetime,
             mRocketEntity = missileCacheAspect.GetRandomRocket(),
             mPlayerPosition = playerAspect.Transform.Position,
-            mParallelCommandBuffer = commandBuffer.AsParallelWriter(),
+            mParticlesCacheEntity = SystemAPI.GetSingletonEntity<ParticlesCache>(),
             mLocalToWorldLookup = state.GetComponentLookup<LocalToWorld>(true),
             mFlockPropertiesLookup = state.GetComponentLookup<FlockProperties>(true),
-            mBirdLookup = state.GetBufferLookup<FlockBirdElement>(true),
-            mFlockUpdateDataLookup = state.GetComponentLookup<FlockUpdateData>()
+            mBirdLookup = state.GetBufferLookup<FlockBirdElement>(),
+            mFlockUpdateDataLookup = state.GetComponentLookup<FlockUpdateData>(),
+            mParticleSpawnBuffer = SystemAPI.GetBufferLookup<ParticleSpawnElement>(),
+            mParallelCommandBuffer = commandBuffer.AsParallelWriter()
         };
         
         state.Dependency = job.ScheduleParallel(state.Dependency);
@@ -68,12 +70,12 @@ public partial struct FlockFlightJob : IJobEntity
 
     public float mRocketLifetime;
 
-    public Entity mRocketEntity;
-
     [ReadOnly]
     public float3 mPlayerPosition;
 
-    public EntityCommandBuffer.ParallelWriter mParallelCommandBuffer;
+    public Entity mRocketEntity;
+
+    public Entity mParticlesCacheEntity;
 
     [ReadOnly]
     public ComponentLookup<LocalToWorld> mLocalToWorldLookup;
@@ -81,15 +83,32 @@ public partial struct FlockFlightJob : IJobEntity
     [ReadOnly]
     public ComponentLookup<FlockProperties> mFlockPropertiesLookup;
 
-    [ReadOnly]
+    [NativeDisableParallelForRestriction]
     public BufferLookup<FlockBirdElement> mBirdLookup;
 
     [NativeDisableParallelForRestriction]
     public ComponentLookup<FlockUpdateData> mFlockUpdateDataLookup;
 
+    [NativeDisableParallelForRestriction]
+    public BufferLookup<ParticleSpawnElement> mParticleSpawnBuffer;
+
+    public EntityCommandBuffer.ParallelWriter mParallelCommandBuffer;
+
     [BurstCompile]
-    public void Execute(ref LocalTransform transform, [ChunkIndexInQuery] int sortKey, in BirdData birdData, ref PhysicsVelocity physicsVelocity)
+    public void Execute(ref LocalTransform transform, [ChunkIndexInQuery] int sortKey, in Entity entity, in BirdData birdData, ref PhysicsVelocity physicsVelocity)
     {
+        if (birdData.mMarkedToDestroy)
+        {
+            if (mBirdLookup.HasBuffer(birdData.mOwningFlock))
+            {
+                mBirdLookup[birdData.mOwningFlock].RemoveAt(birdData.mBufferIndex);
+            }
+
+            SpawnExplosion(transform);
+            mParallelCommandBuffer.DestroyEntity(sortKey, entity);
+            return;
+        }
+
         if (mFlockPropertiesLookup.TryGetComponent(birdData.mOwningFlock, out FlockProperties flockProperties))
         {
             if (!mFlockUpdateDataLookup.HasComponent(birdData.mOwningFlock))
@@ -105,7 +124,7 @@ public partial struct FlockFlightJob : IJobEntity
                 flockUpdate.ValueRW.mClosestBirdDistance = distanceToTarget;
             
             DynamicBuffer<FlockBirdElement> flockMembers = mBirdLookup[birdData.mOwningFlock];
-
+            
             float3 cohesion = float3.zero;
             float3 separation = float3.zero;
             
@@ -151,6 +170,7 @@ public partial struct FlockFlightJob : IJobEntity
         }
     }
 
+    [BurstCompile]
     private void SpawnRockets(LocalTransform transform, float fireRateTime, int sortKey, RefRW<FlockUpdateData> flockUpdate, FlockProperties flockProperties)
     {
         float lastFireTime = flockUpdate.ValueRO.mLastFireTime;
@@ -177,6 +197,19 @@ public partial struct FlockFlightJob : IJobEntity
 
             flockUpdate.ValueRW.mRocketsFired++;
             flockUpdate.ValueRW.mLastFireTime = mTime;
+        }
+    }
+
+    [BurstCompile]
+    private void SpawnExplosion(LocalTransform transform)
+    {
+        if (mParticleSpawnBuffer.HasBuffer(mParticlesCacheEntity))
+        {
+            mParticleSpawnBuffer[mParticlesCacheEntity].Add(new ParticleSpawnElement
+            {
+                mSpawnPosition = transform.Position,
+                mSpawnRotation = transform.Rotation
+            });
         }
     }
 }

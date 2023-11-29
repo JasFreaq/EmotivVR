@@ -19,9 +19,15 @@ public readonly partial struct MissileCacheAspect : IAspect
     
     public float LaserSpeed => m_missileCache.ValueRO.mLaserSpeed;
     
+    public int LaserDamage => m_missileCache.ValueRO.mLaserDamage;
+    
     public float RocketLifetime => m_missileCache.ValueRO.mRocketLifetime;
     
     public float RocketSpeed => m_missileCache.ValueRO.mRocketSpeed;
+    
+    public int RocketDamage => m_missileCache.ValueRO.mRocketDamage;
+    
+    public int ShipDamage => m_missileCache.ValueRO.mShipDamage;
 
     public Entity GetRandomLaser()
     {

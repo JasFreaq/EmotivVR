@@ -21,7 +21,7 @@ public partial struct LaserLocomotionSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileRandomUtility>();
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
         MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
@@ -53,6 +53,12 @@ public partial struct LaserLocomotionJob : IJobEntity
     [BurstCompile]
     public void Execute(ref LocalTransform transform, [ChunkIndexInQuery] int sortKey, in Entity entity, ref LaserData laserData)
     {
+        if (laserData.mMarkedToDestroy)
+        {
+            mParallelCommandBuffer.DestroyEntity(sortKey, entity);
+            return;
+        }
+
         laserData.mLifetimeCounter -= mDeltaTime;
         if (laserData.mLifetimeCounter > 0f)
         {
@@ -64,7 +70,7 @@ public partial struct LaserLocomotionJob : IJobEntity
         }
         else
         {
-            mParallelCommandBuffer.DestroyEntity(sortKey, entity);
+            laserData.mMarkedToDestroy = true;
         }
     }
 }
