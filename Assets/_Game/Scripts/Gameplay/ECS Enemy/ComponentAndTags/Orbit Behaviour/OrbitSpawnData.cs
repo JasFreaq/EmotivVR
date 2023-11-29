@@ -5,6 +5,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 public struct OrbitSpawnData : IComponentData
 {
@@ -19,5 +20,6 @@ public struct OrbitSpawnData : IComponentData
     public float3 mOrbitMemberHalfBounds;
 
     public Entity mSatellitePrefab;
-    public int mSatelliteCount;
+
+    public Random mRand;
 }

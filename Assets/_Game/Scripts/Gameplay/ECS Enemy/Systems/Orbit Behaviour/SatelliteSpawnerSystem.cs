@@ -74,7 +74,6 @@ public partial struct SatelliteSpawnerSystem : ISystem
                 else
                 {
                     commandBuffer.RemoveComponent<OrbitSpawnData>(orbitEntity);
-                    commandBuffer.RemoveComponent<RandomUtility>(orbitEntity);
                 }
 
                 allOrbitsSpawned = false;

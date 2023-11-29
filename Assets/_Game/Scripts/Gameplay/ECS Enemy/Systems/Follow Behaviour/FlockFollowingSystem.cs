@@ -20,7 +20,7 @@ public partial struct FlockFollowingSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerPositionData>();
+        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
 
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
 
@@ -38,7 +38,7 @@ public partial struct FlockFollowingJob : IJobEntity
     public float3 mPlayerPosition;
 
     [BurstCompile]
-    public void Execute(ref LocalTransform transform, in FlockFollower flockFollower, ref FlockUpdateData flockUpdate, ref RandomUtility random)
+    public void Execute(ref LocalTransform transform, in FlockFollower flockFollower, ref FlockUpdateData flockUpdate)
     {
 
         if (flockUpdate.mClosestBirdDistance - float.Epsilon <= flockFollower.mBirdsProximityForUpdate) 
@@ -47,8 +47,8 @@ public partial struct FlockFollowingJob : IJobEntity
 
             do
             {
-                float elevation = math.acos(random.mRand.NextFloat(0, 2) - 1);
-                float azimuth = random.mRand.NextFloat(0, math.PI * 2);
+                float elevation = math.acos(flockUpdate.mRand.NextFloat(0, 2) - 1);
+                float azimuth = flockUpdate.mRand.NextFloat(0, math.PI * 2);
 
                 float x = flockFollower.mFollowRadius * math.sin(elevation) * math.cos(azimuth);
                 float y = flockFollower.mFollowRadius * math.sin(elevation) * math.sin(azimuth);

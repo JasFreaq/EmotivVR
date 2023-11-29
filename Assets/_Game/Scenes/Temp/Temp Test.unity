@@ -123,6 +123,144 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &733200291
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 733200292}
+  - component: {fileID: 733200293}
+  m_Layer: 0
+  m_Name: Cache Data
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &733200292
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733200291}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1882427542}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &733200293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733200291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e220ebd02e27244a3ceabcd6daf1e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_laserPrefab: {fileID: 7929725195850624321, guid: 4d00c2e409997c74498a383a0758a07a, type: 3}
+  m_missileType: 0
+--- !u!1 &943504667
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 943504668}
+  - component: {fileID: 943504669}
+  m_Layer: 0
+  m_Name: Cache Data (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &943504668
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943504667}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1882427542}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &943504669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943504667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e220ebd02e27244a3ceabcd6daf1e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_laserPrefab: {fileID: 8051967695340887395, guid: a6739994498910a47999b10767201b19, type: 3}
+  m_missileType: 0
+--- !u!1 &1292304107
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1292304108}
+  - component: {fileID: 1292304109}
+  m_Layer: 0
+  m_Name: Cache Data (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1292304108
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292304107}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1882427542}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1292304109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292304107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e220ebd02e27244a3ceabcd6daf1e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_laserPrefab: {fileID: 8051967695340887395, guid: 8a035b7cd110f4a4f858ccc392d546c8, type: 3}
+  m_missileType: 0
 --- !u!1 &1374748833
 GameObject:
   m_ObjectHideFlags: 0
@@ -167,8 +305,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85f89cb44ce7de548884f15188ded74d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_semiMajorAxis: 10
-  m_semiMinorAxis: 5
+  m_semiMajorAxis: 20
+  m_semiMinorAxis: 10
   m_orbitMemberHalfBounds:
     x: 2
     y: 2
@@ -181,10 +319,12 @@ MonoBehaviour:
     x: 0
     y: 1
     z: 0
-  m_orbitRandomSeed: 10
+  m_orbitSpawnRandomSeed: 11
+  m_orbitUpdateRandomSeed: 51
   m_satellitePrefab: {fileID: 4695566560236114868, guid: fcd273f4e56e675458a5dc4db04e9bf1, type: 3}
   m_satelliteSpeed: 60
   m_satelliteCount: 500
+  m_missilesFiredPerSecond: 4
   m_followSpeed: 10
 --- !u!1 &1630682616
 GameObject:
@@ -197,7 +337,7 @@ GameObject:
   - component: {fileID: 1630682618}
   - component: {fileID: 1630682617}
   m_Layer: 0
-  m_Name: Player Position
+  m_Name: Player Representation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -231,6 +371,105 @@ Transform:
   - {fileID: 2069200969}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1657086257
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1657086258}
+  - component: {fileID: 1657086259}
+  m_Layer: 0
+  m_Name: Cache Data (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1657086258
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657086257}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1882427542}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1657086259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657086257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e220ebd02e27244a3ceabcd6daf1e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_laserPrefab: {fileID: 8051967695340887395, guid: b1cee4a875e13214598bbb08654f0844, type: 3}
+  m_missileType: 0
+--- !u!1 &1882427541
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1882427542}
+  - component: {fileID: 1882427543}
+  m_Layer: 0
+  m_Name: Missile Cache
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1882427542
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882427541}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 733200292}
+  - {fileID: 943504668}
+  - {fileID: 1657086258}
+  - {fileID: 1292304108}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1882427543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882427541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17c56d3c4499cbf47b437d7782f14671, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_laserLifetime: 8
+  m_laserSpeed: 8
+  m_rocketLifetime: 10
+  m_rocketSpeed: 5
+  m_randomMissileSeed: 251
 --- !u!1 &2003462561
 GameObject:
   m_ObjectHideFlags: 0
@@ -271,7 +510,8 @@ MonoBehaviour:
     z: 8
   m_separationRadius: 16
   m_seekWeight: 1
-  m_flockRandomSeed: 5
+  m_flockSpawnRandomSeed: 101
+  m_flockUpdateRandomSeed: 201
   m_birdSpeed: 20
   m_birdPrefab: {fileID: 1418792802177899192, guid: c301d521666552d49ae47ab44e9dc28f, type: 3}
   m_followRadius: 100
@@ -382,3 +622,4 @@ SceneRoots:
   - {fileID: 1374748834}
   - {fileID: 2003462563}
   - {fileID: 1630682618}
+  - {fileID: 1882427542}

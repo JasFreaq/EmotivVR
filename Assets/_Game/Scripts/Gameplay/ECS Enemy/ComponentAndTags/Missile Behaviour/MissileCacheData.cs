@@ -1,18 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
 using UnityEngine;
 
-public class MissileCacheData : MonoBehaviour
+public struct MissileCacheData : IComponentData
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public Entity mPrefab;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public MissileType mMissileType;
+}
+
+public enum MissileType
+{
+    Laser,
+    Rocket
 }

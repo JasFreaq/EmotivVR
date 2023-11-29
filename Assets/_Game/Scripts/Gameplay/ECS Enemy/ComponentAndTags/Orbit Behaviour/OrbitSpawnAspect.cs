@@ -10,8 +10,6 @@ public readonly partial struct OrbitSpawnAspect : IAspect
 {
     private readonly RefRW<OrbitSpawnData> m_orbitSpawnData;
 
-    private readonly RefRW<RandomUtility> m_randomUtility;
-
     public float GenerationTimer
     {
         get => m_orbitSpawnData.ValueRO.mGenerationTimer;
@@ -33,7 +31,7 @@ public readonly partial struct OrbitSpawnAspect : IAspect
     public float3 GetRandomOffset()
     {
         float3 range = m_orbitSpawnData.ValueRO.mOrbitMemberHalfBounds;
-        float3 offset = m_randomUtility.ValueRW.mRand.NextFloat3(-range, range);
+        float3 offset = m_orbitSpawnData.ValueRW.mRand.NextFloat3(-range, range);
 
         return offset;
     }

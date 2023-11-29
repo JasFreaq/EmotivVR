@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
-using UnityEngine;
-using Random = Unity.Mathematics.Random;
+using Unity.Mathematics;
 
-public struct RandomUtility : IComponentData
+public struct MissileRandomUtility : IComponentData
 {
     public Random mRand;
 }

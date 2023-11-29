@@ -14,14 +14,18 @@ public class OrbitMono : MonoBehaviour
     [SerializeField] private int3 m_orbitMemberHalfBounds = new int3(2, 2, 2);
     [SerializeField] private float3 m_orbitThicknessBounds = new float3(2, 2, 2);
     [SerializeField] private float3 m_orbitNormal = math.forward();
-    [SerializeField] private uint m_orbitRandomSeed;
+    [SerializeField] private uint m_orbitSpawnRandomSeed;
+    [SerializeField] private uint m_orbitUpdateRandomSeed;
 
     [Header("Satellites")]
     [SerializeField] private GameObject m_satellitePrefab;
     [SerializeField] private float m_satelliteSpeed = 60f;
     [SerializeField] private int m_satelliteCount = 100;
 
-    [Header("Follow Parameters")] 
+    [Header("Missile")] 
+    [SerializeField] private int m_missilesFiredPerSecond = 4;
+
+    [Header("Follow")] 
     [SerializeField] private float m_followSpeed = 10f;
 
     public float SemiMajorAxis => m_semiMajorAxis;
@@ -34,13 +38,17 @@ public class OrbitMono : MonoBehaviour
 
     public float3 OrbitNormal => m_orbitNormal;
 
-    public uint OrbitRandomSeed => m_orbitRandomSeed;
+    public uint OrbitSpawnRandomSeed => m_orbitSpawnRandomSeed;
+    
+    public uint OrbitUpdateRandomSeed => m_orbitUpdateRandomSeed;
 
     public GameObject SatellitePrefab => m_satellitePrefab;
 
     public float SatelliteSpeed => m_satelliteSpeed;
 
     public int SatelliteCount => m_satelliteCount;
+    
+    public int MissilesFiredPerSecond => m_missilesFiredPerSecond;
 
     public float FollowSpeed => m_followSpeed;
 }
@@ -73,12 +81,14 @@ public class OrbitBaker : Baker<OrbitMono>
             mSpawnTimeCounter = 0,
             mOrbitMemberHalfBounds = authoring.OrbitMemberHalfBounds,
             mSatellitePrefab = GetEntity(authoring.SatellitePrefab, TransformUsageFlags.Dynamic),
-            mSatelliteCount = authoring.SatelliteCount
+            mRand = Random.CreateFromIndex(authoring.OrbitSpawnRandomSeed)
         });
 
-        AddComponent(orbitEntity, new RandomUtility
+        AddComponent(orbitEntity, new OrbitUpdateData
         {
-            mRand = Random.CreateFromIndex(authoring.OrbitRandomSeed)
+            mFireRateTime = 1f / authoring.MissilesFiredPerSecond,
+            mOrbitSatelliteCount = authoring.SatelliteCount,
+            mRand = Random.CreateFromIndex(authoring.OrbitUpdateRandomSeed)
         });
     }
 }

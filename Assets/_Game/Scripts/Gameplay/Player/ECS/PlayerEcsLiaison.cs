@@ -6,21 +6,47 @@ using UnityEngine;
 public class PlayerEcsLiaison : MonoBehaviour
 {
     private EntityManager m_entityManager;
-    private EntityQuery m_entityQuery;
-    
+    private EntityQuery m_positionQuery;
+    private EntityQuery m_cameraQuery;
+
+    public bool m_addedCameraDetails;
+
     private void Start()
     {
         m_entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        m_entityQuery = m_entityManager.CreateEntityQuery(typeof(PlayerPositionData));
+        
+        m_positionQuery = m_entityManager.CreateEntityQuery(typeof(PlayerTransformData));
+        m_cameraQuery = m_entityManager.CreateEntityQuery(typeof(PlayerCameraProperties));
     }
     
     private void Update()
     {
-        if (m_entityQuery.TryGetSingleton(out PlayerPositionData playerPositionData)) 
+        if (m_positionQuery.TryGetSingleton(out PlayerTransformData playerTransformData)) 
         {
-            playerPositionData.mPlayerPosition = transform.position;
+            playerTransformData.mPlayerPosition = transform.position;
+            playerTransformData.mPlayerRotation = transform.rotation;
 
-            m_entityQuery.SetSingleton(playerPositionData);
+            m_positionQuery.SetSingleton(playerTransformData);
+        }
+
+        if (!m_addedCameraDetails)
+        {
+            if (m_cameraQuery.HasSingleton<PlayerCameraProperties>())
+            {
+                Camera mainCamera = Camera.main;
+
+                PlayerCameraProperties playerCameraProperties = new PlayerCameraProperties
+                {
+                    mCameraHalfFOV = mainCamera.fieldOfView * 0.5f,
+                    mCameraAspect = mainCamera.aspect,
+                    mCameraNearClipPlane = mainCamera.nearClipPlane,
+                    mCameraFarClipPlane = mainCamera.farClipPlane
+                };
+
+                m_cameraQuery.SetSingleton(playerCameraProperties);
+
+                m_addedCameraDetails = true;
+            }
         }
     }
 }

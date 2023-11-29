@@ -21,16 +21,10 @@ public partial struct FlockAssignmentSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        foreach ((RefRO<BirdData> birdData, Entity birdEntity) in
-                 SystemAPI.Query<RefRO<BirdData>>().WithEntityAccess())
+        foreach ((RefRO<BirdData> birdData, Entity birdEntity) in SystemAPI.Query<RefRO<BirdData>>().WithEntityAccess())
         {
-            FlockAspect flockAspect = SystemAPI.GetAspect<FlockAspect>(birdData.ValueRO.mOwningFlock);
-
-            FixedList512Bytes<Entity> flockMembers = flockAspect.Birds;
-
+            DynamicBuffer<FlockBirdElement> flockMembers = SystemAPI.GetBuffer<FlockBirdElement>(birdData.ValueRO.mOwningFlock);
             flockMembers.Add(birdEntity);
-
-            flockAspect.Birds = flockMembers;
         }
 
         state.Enabled = false;

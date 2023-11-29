@@ -4,7 +4,9 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-public struct PlayerPositionData : IComponentData
+public struct PlayerTransformData : IComponentData
 {
     public float3 mPlayerPosition;
+    
+    public quaternion mPlayerRotation;
 }

@@ -7,6 +7,7 @@ using Unity.Transforms;
 using UnityEngine;
 
 [BurstCompile]
+[UpdateInGroup(typeof(SimulationSystemGroup))]
 [UpdateAfter(typeof(SatelliteOrbitingSystem))]
 public partial struct OrbitFollowingSystem : ISystem
 {
@@ -19,7 +20,7 @@ public partial struct OrbitFollowingSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerPositionData>();
+        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
 
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
 

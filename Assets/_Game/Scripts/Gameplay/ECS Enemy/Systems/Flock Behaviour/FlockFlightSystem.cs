@@ -13,35 +13,27 @@ using UnityEngine;
 [RequireMatchingQueriesForUpdate]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateBefore(typeof(PhysicsSystemGroup))]
-public partial class FlockFlightSystem : SystemBase
+public partial struct FlockFlightSystem : ISystem
 {
-    private EntityQuery m_query;
-
     [BurstCompile]
-    protected override void OnCreate()
+    public void OnCreate(ref SystemState state)
     {
-        RequireForUpdate<BirdData>();
-
-        m_query = GetEntityQuery
-        (
-            typeof(LocalTransform),
-            ComponentType.ReadOnly<BirdData>(),
-            ComponentType.ReadWrite<PhysicsVelocity>()
-        );
+        state.RequireForUpdate<BirdData>();
     }
     
     [BurstCompile]
-    protected override void OnUpdate()
+    public void OnUpdate(ref SystemState state)
     {
         FlockFlightJob job = new FlockFlightJob
         {
             mDeltaTime = SystemAPI.Time.DeltaTime,
-            mLocalToWorldLookup = GetComponentLookup<LocalToWorld>(true),
-            mFlockPropertiesLookup = GetComponentLookup<FlockProperties>(true),
-            mFlockUpdateDataLookup = GetComponentLookup<FlockUpdateData>()
+            mLocalToWorldLookup = state.GetComponentLookup<LocalToWorld>(true),
+            mFlockPropertiesLookup = state.GetComponentLookup<FlockProperties>(true),
+            mBirdLookup = state.GetBufferLookup<FlockBirdElement>(true),
+            mFlockUpdateDataLookup = state.GetComponentLookup<FlockUpdateData>()
         };
-
-        Dependency = job.ScheduleParallel(m_query, Dependency);
+        
+        state.Dependency = job.ScheduleParallel(state.Dependency);
     }
 }
 
@@ -49,18 +41,21 @@ public partial class FlockFlightSystem : SystemBase
 public partial struct FlockFlightJob : IJobEntity
 {
     public float mDeltaTime;
-
+    
     [ReadOnly]
     public ComponentLookup<LocalToWorld> mLocalToWorldLookup;
 
     [ReadOnly]
     public ComponentLookup<FlockProperties> mFlockPropertiesLookup;
-    
+
+    [ReadOnly]
+    public BufferLookup<FlockBirdElement> mBirdLookup;
+
     [NativeDisableParallelForRestriction]
     public ComponentLookup<FlockUpdateData> mFlockUpdateDataLookup;
 
     [BurstCompile]
-    public void Execute(ref LocalTransform transform, in BirdData birdData, ref PhysicsVelocity physicsVelocity)
+    public void Execute(ref LocalTransform transform, [ChunkIndexInQuery] int sortKey, in BirdData birdData, ref PhysicsVelocity physicsVelocity)
     {
         if (mFlockPropertiesLookup.TryGetComponent(birdData.mOwningFlock, out FlockProperties flockProperties))
         {
@@ -73,20 +68,20 @@ public partial struct FlockFlightJob : IJobEntity
 
             if (distanceToTarget < mFlockUpdateDataLookup.GetRefRO(birdData.mOwningFlock).ValueRO.mClosestBirdDistance)
                 mFlockUpdateDataLookup.GetRefRW(birdData.mOwningFlock).ValueRW.mClosestBirdDistance = distanceToTarget;
-
-            FixedList512Bytes<Entity> flockMembers = mFlockUpdateDataLookup.GetRefRO(birdData.mOwningFlock).ValueRO.mBirds;
+            
+            DynamicBuffer<FlockBirdElement> flockMembers = mBirdLookup[birdData.mOwningFlock];
 
             float3 cohesion = float3.zero;
             float3 separation = float3.zero;
             
             float3 velocity = physicsVelocity.Linear;
 
-            foreach (Entity otherBirdEntity in flockMembers)
+            foreach (FlockBirdElement otherBirdElement in flockMembers)
             {
-                if (!mLocalToWorldLookup.HasComponent(otherBirdEntity))
+                if (!mLocalToWorldLookup.HasComponent(otherBirdElement.mBird))
                     return;
 
-                float3 otherBirdPosition = mLocalToWorldLookup.GetRefRO(otherBirdEntity).ValueRO.Position;
+                float3 otherBirdPosition = mLocalToWorldLookup.GetRefRO(otherBirdElement.mBird).ValueRO.Position;
                 float distance = math.distance(transform.Position, otherBirdPosition);
 
                 if (distance <= float.Epsilon) 

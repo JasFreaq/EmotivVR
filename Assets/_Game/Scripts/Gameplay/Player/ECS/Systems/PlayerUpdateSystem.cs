@@ -5,21 +5,22 @@ using Unity.Entities;
 using UnityEngine;
 
 [BurstCompile]
+[UpdateInGroup(typeof(SimulationSystemGroup))]
 public partial struct PlayerUpdateSystem : ISystem
 {
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPositionData>();
+        state.RequireForUpdate<PlayerTransformData>();
     }
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerPositionData>();
+        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
 
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
 
-        playerAspect.UpdatePosition();
+        playerAspect.UpdateTransform();
     }
 }

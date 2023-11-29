@@ -14,7 +14,8 @@ public class FlockMono : MonoBehaviour
     [SerializeField] private float3 m_flockSpreadRange = new float3(8f, 2f, 7f);
     [SerializeField] private float m_separationRadius = 8f;
     [SerializeField] [Range(0f, 1f)] private float m_seekWeight = 1f;
-    [SerializeField] private uint m_flockRandomSeed;
+    [SerializeField] private uint m_flockSpawnRandomSeed;
+    [SerializeField] private uint m_flockUpdateRandomSeed;
 
     [Header("Birds")]
     [SerializeField] private float m_birdSpeed = 20f;
@@ -39,7 +40,9 @@ public class FlockMono : MonoBehaviour
 
     public float BirdSpeed => m_birdSpeed;
 
-    public uint FlockRandomSeed => m_flockRandomSeed;
+    public uint FlockSpawnRandomSeed => m_flockSpawnRandomSeed;
+    
+    public uint FlockUpdateRandomSeed => m_flockUpdateRandomSeed;
 
     public float FollowRadius => m_followRadius;
     
@@ -73,18 +76,16 @@ public class FlockBaker : Baker<FlockMono>
         {
             mFlockSpawnBounds = authoring.FlockSpawnBounds,
             mFlockSpreadRange = authoring.FlockSpreadRange,
-            mBirdPrefab = GetEntity(authoring.BirdPrefab, TransformUsageFlags.Dynamic)
+            mBirdPrefab = GetEntity(authoring.BirdPrefab, TransformUsageFlags.Dynamic),
+            mRand = Random.CreateFromIndex(authoring.FlockSpawnRandomSeed)
         });
 
-        AddComponent(flockEntity, new RandomUtility
-        {
-            mRand = Random.CreateFromIndex(authoring.FlockRandomSeed)
-        });
+        AddComponent<FlockBirdElement>(flockEntity);
 
         AddComponent(flockEntity, new FlockUpdateData
         {
-            mBirds = new FixedList512Bytes<Entity>(),
-            mClosestBirdDistance = float.MaxValue
+            mClosestBirdDistance = float.MaxValue,
+            mRand = Random.CreateFromIndex(authoring.FlockUpdateRandomSeed)
         });
     }
 }
