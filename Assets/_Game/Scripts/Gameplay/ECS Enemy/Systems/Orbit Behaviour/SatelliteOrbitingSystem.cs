@@ -41,14 +41,14 @@ public partial struct SatelliteOrbitingSystem : ISystem
         {
             mDeltaTime = SystemAPI.Time.DeltaTime,
             mTime = (float)SystemAPI.Time.ElapsedTime,
-            mLaserLifetime = missileCacheAspect.LaserLifetime,
-            mLaserEntity = missileCacheAspect.GetRandomLaser(),
+            mMissileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>(),
             mParticlesCacheEntity = SystemAPI.GetSingletonEntity<ParticlesCache>(),
             mPlayerTransform = playerAspect.Transform,
             mCameraProperties = playerAspect.CameraProperties,
             mLocalToWorldLookup = state.GetComponentLookup<LocalToWorld>(true),
             mOrbitPropertiesLookup = state.GetComponentLookup<OrbitProperties>(true),
             mOrbitUpdateDataLookup = state.GetComponentLookup<OrbitUpdateData>(),
+            mMissileSpawnBuffer = SystemAPI.GetBufferLookup<MissileSpawnElement>(),
             mParticleSpawnBuffer = SystemAPI.GetBufferLookup<ParticleSpawnElement>(),
             mParallelCommandBuffer = commandBuffer.AsParallelWriter()
         };
@@ -67,10 +67,8 @@ public partial struct SatelliteOrbitingJob : IJobEntity
     public float mDeltaTime;
 
     public float mTime;
-
-    public float mLaserLifetime;
-
-    public Entity mLaserEntity;
+    
+    public Entity mMissileCacheEntity;
 
     public Entity mParticlesCacheEntity;
 
@@ -88,6 +86,9 @@ public partial struct SatelliteOrbitingJob : IJobEntity
 
     [NativeDisableParallelForRestriction]
     public ComponentLookup<OrbitUpdateData> mOrbitUpdateDataLookup;
+
+    [NativeDisableParallelForRestriction]
+    public BufferLookup<MissileSpawnElement> mMissileSpawnBuffer;
 
     [NativeDisableParallelForRestriction]
     public BufferLookup<ParticleSpawnElement> mParticleSpawnBuffer;
@@ -148,7 +149,7 @@ public partial struct SatelliteOrbitingJob : IJobEntity
 
                 RefRW<OrbitUpdateData> orbitUpdate = mOrbitUpdateDataLookup.GetRefRW(satelliteData.mTargetOrbit);
 
-                SpawnLasers(orbitProperties.mFireRateTime, sortKey, orbitUpdate, smoothedPosition, upDirection, lookDirection);
+                SpawnLasers(orbitProperties.mFireRateTime, orbitUpdate, smoothedPosition, upDirection, lookDirection);
             }
         }
     }
@@ -173,7 +174,7 @@ public partial struct SatelliteOrbitingJob : IJobEntity
     }
 
     [BurstCompile]
-    private void SpawnLasers(float fireRateTime, int sortKey, RefRW<OrbitUpdateData> orbitUpdate, float3 smoothedPosition, float3 upDirection, float3 lookDirection)
+    private void SpawnLasers(float fireRateTime, RefRW<OrbitUpdateData> orbitUpdate, float3 smoothedPosition, float3 upDirection, float3 lookDirection)
     {
         float lastFireTime = orbitUpdate.ValueRO.mLastFireTime;
         float fireTimer = orbitUpdate.ValueRO.mFireTimer;
@@ -185,23 +186,17 @@ public partial struct SatelliteOrbitingJob : IJobEntity
 
             if (fireChance < 1f / satelliteCount)
             {
-                Entity laserEntity = mParallelCommandBuffer.Instantiate(sortKey, mLaserEntity);
-
-                LocalTransform spawnTransform = new LocalTransform
+                if (mMissileSpawnBuffer.HasBuffer(mMissileCacheEntity))
                 {
-                    Position = smoothedPosition,
-                    Rotation = quaternion.LookRotation(upDirection, lookDirection),
-                    Scale = 1f
-                };
-                mParallelCommandBuffer.SetComponent(sortKey, laserEntity, spawnTransform);
-                
-                LaserData laserData = new LaserData
-                {
-                    mLifetimeCounter = mLaserLifetime
-                };
-                mParallelCommandBuffer.AddComponent(sortKey, laserEntity, laserData);
+                    mMissileSpawnBuffer[mMissileCacheEntity].Add(new MissileSpawnElement
+                    {
+                        mSpawnPosition = smoothedPosition,
+                        mSpawnRotation = quaternion.LookRotation(upDirection, lookDirection),
+                        mMissileType = MissileType.Laser
+                    });
 
-                orbitUpdate.ValueRW.mLastFireTime = mTime;
+                    orbitUpdate.ValueRW.mLastFireTime = mTime;
+                }
             }
         }
     }

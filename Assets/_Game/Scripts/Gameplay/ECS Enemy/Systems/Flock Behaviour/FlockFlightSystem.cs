@@ -29,9 +29,6 @@ public partial struct FlockFlightSystem : ISystem
             flockUpdateData.ValueRW.mFireTimer += SystemAPI.Time.DeltaTime;
         }
 
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
-        MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
-
         Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
 
@@ -41,14 +38,14 @@ public partial struct FlockFlightSystem : ISystem
         {
             mDeltaTime = SystemAPI.Time.DeltaTime,
             mTime = (float)SystemAPI.Time.ElapsedTime,
-            mRocketLifetime = missileCacheAspect.RocketLifetime,
-            mRocketEntity = missileCacheAspect.GetRandomRocket(),
             mPlayerPosition = playerAspect.Transform.Position,
+            mMissileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>(),
             mParticlesCacheEntity = SystemAPI.GetSingletonEntity<ParticlesCache>(),
             mLocalToWorldLookup = state.GetComponentLookup<LocalToWorld>(true),
             mFlockPropertiesLookup = state.GetComponentLookup<FlockProperties>(true),
             mBirdLookup = state.GetBufferLookup<FlockBirdElement>(),
             mFlockUpdateDataLookup = state.GetComponentLookup<FlockUpdateData>(),
+            mMissileSpawnBuffer = SystemAPI.GetBufferLookup<MissileSpawnElement>(),
             mParticleSpawnBuffer = SystemAPI.GetBufferLookup<ParticleSpawnElement>(),
             mParallelCommandBuffer = commandBuffer.AsParallelWriter()
         };
@@ -67,14 +64,12 @@ public partial struct FlockFlightJob : IJobEntity
     public float mDeltaTime;
 
     public float mTime;
-
-    public float mRocketLifetime;
-
+    
     [ReadOnly]
     public float3 mPlayerPosition;
 
-    public Entity mRocketEntity;
-
+    public Entity mMissileCacheEntity;
+    
     public Entity mParticlesCacheEntity;
 
     [ReadOnly]
@@ -89,6 +84,9 @@ public partial struct FlockFlightJob : IJobEntity
     [NativeDisableParallelForRestriction]
     public ComponentLookup<FlockUpdateData> mFlockUpdateDataLookup;
 
+    [NativeDisableParallelForRestriction]
+    public BufferLookup<MissileSpawnElement> mMissileSpawnBuffer;
+    
     [NativeDisableParallelForRestriction]
     public BufferLookup<ParticleSpawnElement> mParticleSpawnBuffer;
 
@@ -165,13 +163,13 @@ public partial struct FlockFlightJob : IJobEntity
             
             if (math.distance(transform.Position, mPlayerPosition) <= flockProperties.mBirdAttackRange) 
             {
-                SpawnRockets(transform, flockProperties.mFireRateTime, sortKey, flockUpdate, flockProperties);
+                SpawnRockets(transform, flockProperties.mFireRateTime, flockUpdate, flockProperties);
             }
         }
     }
 
     [BurstCompile]
-    private void SpawnRockets(LocalTransform transform, float fireRateTime, int sortKey, RefRW<FlockUpdateData> flockUpdate, FlockProperties flockProperties)
+    private void SpawnRockets(LocalTransform transform, float fireRateTime, RefRW<FlockUpdateData> flockUpdate, FlockProperties flockProperties)
     {
         float lastFireTime = flockUpdate.ValueRO.mLastFireTime;
         float fireTimer = flockUpdate.ValueRO.mFireTimer;
@@ -179,24 +177,32 @@ public partial struct FlockFlightJob : IJobEntity
         if (fireTimer - lastFireTime >= fireRateTime &&
             flockUpdate.ValueRO.mRocketsFired < flockProperties.mRocketsPerPatrol)
         {
-            Entity rocketEntity = mParallelCommandBuffer.Instantiate(sortKey, mRocketEntity);
-
-            LocalTransform spawnTransform = new LocalTransform
+            if (mMissileSpawnBuffer.HasBuffer(mMissileCacheEntity))
             {
-                Position = transform.Position,
-                Rotation = transform.Rotation,
-                Scale = 1f
-            };
-            mParallelCommandBuffer.SetComponent(sortKey, rocketEntity, spawnTransform);
+                mMissileSpawnBuffer[mMissileCacheEntity].Add(new MissileSpawnElement
+                {
+                    mSpawnPosition = transform.Position,
+                    mSpawnRotation = transform.Rotation,
+                    mMissileType = MissileType.Rocket
+                });
 
-            RocketData rocketData = new RocketData
-            {
-                mLifetimeCounter = mRocketLifetime
-            };
-            mParallelCommandBuffer.AddComponent(sortKey, rocketEntity, rocketData);
+                flockUpdate.ValueRW.mRocketsFired++;
+                flockUpdate.ValueRW.mLastFireTime = mTime;
+            }
 
-            flockUpdate.ValueRW.mRocketsFired++;
-            flockUpdate.ValueRW.mLastFireTime = mTime;
+            //LocalTransform spawnTransform = new LocalTransform
+            //{
+            //    Position = transform.Position,
+            //    Rotation = transform.Rotation,
+            //    Scale = 1f
+            //};
+            //mParallelCommandBuffer.SetComponent(sortKey, rocketEntity, spawnTransform);
+
+            //RocketData rocketData = new RocketData
+            //{
+            //    mLifetimeCounter = mRocketLifetime
+            //};
+            //mParallelCommandBuffer.AddComponent(sortKey, rocketEntity, rocketData);
         }
     }
 

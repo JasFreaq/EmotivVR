@@ -9,7 +9,7 @@ using UnityEngine;
 
 [BurstCompile]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
-[UpdateAfter(typeof(ParticleSpawnSystem))]
+[UpdateAfter(typeof(ParticleSpawnerSystem))]
 public partial struct ParticleCountdownSystem : ISystem
 {
     [BurstCompile]
