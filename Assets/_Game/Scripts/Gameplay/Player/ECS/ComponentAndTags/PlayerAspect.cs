@@ -15,15 +15,13 @@ public readonly partial struct PlayerAspect : IAspect
     
     private readonly RefRO<PlayerCameraProperties> m_playerCameraProperties;
     
-    private readonly RefRW<PlayerHealthData> m_playerHealthData;
-
     public LocalTransform Transform => m_transform.ValueRO;
 
     public float3 PlayerPosition => m_transform.ValueRO.Position;
     
+    public quaternion PlayerRotation => m_transform.ValueRO.Rotation;
+    
     public PlayerCameraProperties CameraProperties => m_playerCameraProperties.ValueRO;
-
-    public RefRW<PlayerHealthData> PlayerHealthData => m_playerHealthData;
 
     public void UpdateTransform()
     {

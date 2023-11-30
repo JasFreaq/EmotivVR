@@ -15,6 +15,8 @@ public class EyeLaserHandler : MonoBehaviour
 
     public bool IsLaserFullyScaled => Math.Abs(m_laserLine.EndPos.y - m_laserLengthWindows[^1]) < Mathf.Epsilon;
 
+    public float LaserRange => m_laserLine.EndPos.y;
+
     public void SetLaserScaling(int lengthIndex, float lengthRatio, float widthRatio)
     {
         float length = Mathf.Lerp(m_laserLengthWindows[lengthIndex], m_laserLengthWindows[lengthIndex + 1],

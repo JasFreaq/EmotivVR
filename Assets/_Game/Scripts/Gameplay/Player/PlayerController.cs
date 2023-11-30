@@ -17,10 +17,14 @@ public class PlayerController : MonoBehaviour
 
     private float m_laserTimer;
 
-    private bool m_isPlayerLaserInput;
+    [SerializeField] private bool m_isPlayerLaserInput;
 
     public bool IsPlayerLaserInput { set => m_isPlayerLaserInput = value; }
 
+    public bool IsLaserActive => m_eyeLaser.gameObject.activeSelf;
+    
+    public float LaserRange => m_eyeLaser.LaserRange;
+    
     private void Awake()
     {
         m_rigidbody = GetComponent<Rigidbody>();

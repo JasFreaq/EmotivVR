@@ -7,6 +7,7 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [BurstCompile]
@@ -99,7 +100,19 @@ public partial struct FlockFlightJob : IJobEntity
         {
             if (mBirdLookup.HasBuffer(birdData.mOwningFlock))
             {
-                mBirdLookup[birdData.mOwningFlock].RemoveAt(birdData.mBufferIndex);
+                DynamicBuffer<FlockBirdElement> birdBuffer = mBirdLookup[birdData.mOwningFlock];
+
+                int birdIndex = -1;
+                for (int i = 0, l = birdBuffer.Length; i < l; i++)
+                {
+                    if (entity == birdBuffer[i].mBird)
+                    {
+                        birdIndex = i;
+                        break;
+                    }
+                }
+
+                birdBuffer.RemoveAt(birdIndex);
             }
 
             SpawnExplosion(transform);

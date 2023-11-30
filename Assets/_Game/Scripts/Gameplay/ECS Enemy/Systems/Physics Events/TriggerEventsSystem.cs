@@ -1,0 +1,89 @@
+using System.Collections;
+using System.Collections.Generic;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Entities;
+using Unity.Physics;
+using Unity.Physics.Systems;
+using UnityEngine;
+
+[BurstCompile]
+[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+[UpdateAfter(typeof(PhysicsSimulationGroup))]
+public partial struct TriggerEventsSystem : ISystem
+{
+    [BurstCompile]
+    public void OnCreate(ref SystemState state)
+    {
+        state.RequireForUpdate<PlayerEyeLaserData>();
+        state.RequireForUpdate<SimulationSingleton>();
+    }
+
+    [BurstCompile]
+    public void OnUpdate(ref SystemState state)
+    {
+        TriggerEventsJob triggerJob = new TriggerEventsJob
+        {
+            mPlayerEyeLaserLookup = SystemAPI.GetComponentLookup<PlayerEyeLaserData>(true),
+            mSatelliteLookup = SystemAPI.GetComponentLookup<SatelliteData>(),
+            mBirdLookup = SystemAPI.GetComponentLookup<BirdData>(),
+            mLaserLookup = SystemAPI.GetComponentLookup<LaserData>(),
+            mRocketLookup = SystemAPI.GetComponentLookup<RocketData>()
+        };
+
+        state.Dependency = triggerJob.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
+    }
+}
+
+[BurstCompile]
+public struct TriggerEventsJob : ITriggerEventsJob
+{
+    [ReadOnly]
+    public ComponentLookup<PlayerEyeLaserData> mPlayerEyeLaserLookup;
+
+    [NativeDisableParallelForRestriction]
+    public ComponentLookup<SatelliteData> mSatelliteLookup;
+
+    [NativeDisableParallelForRestriction]
+    public ComponentLookup<BirdData> mBirdLookup;
+
+    [NativeDisableParallelForRestriction]
+    public ComponentLookup<LaserData> mLaserLookup;
+
+    [NativeDisableParallelForRestriction]
+    public ComponentLookup<RocketData> mRocketLookup;
+
+    public void Execute(TriggerEvent triggerEvent)
+    {
+        Entity playerEntity;
+        Entity otherEntity;
+
+        if (mPlayerEyeLaserLookup.HasComponent(triggerEvent.EntityA))
+        {
+            playerEntity = triggerEvent.EntityA;
+            otherEntity = triggerEvent.EntityB;
+        }
+        else
+        {
+            playerEntity = triggerEvent.EntityB;
+            otherEntity = triggerEvent.EntityA;
+        }
+        
+        if (mSatelliteLookup.HasComponent(otherEntity))
+        {
+            mSatelliteLookup.GetRefRW(otherEntity).ValueRW.mMarkedToDestroy = true;
+        }
+        else if (mBirdLookup.HasComponent(otherEntity))
+        {
+            mBirdLookup.GetRefRW(otherEntity).ValueRW.mMarkedToDestroy = true;
+        }
+        else if (mLaserLookup.HasComponent(otherEntity))
+        {
+            mLaserLookup.GetRefRW(otherEntity).ValueRW.mMarkedToDestroy = true;
+        }
+        else if (mRocketLookup.HasComponent(otherEntity))
+        {
+            mRocketLookup.GetRefRW(otherEntity).ValueRW.mMarkedToDestroy = true;
+        }
+    }
+}

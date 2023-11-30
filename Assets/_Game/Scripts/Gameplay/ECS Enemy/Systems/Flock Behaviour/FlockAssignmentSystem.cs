@@ -24,10 +24,6 @@ public partial struct FlockAssignmentSystem : ISystem
         foreach ((RefRW<BirdData> birdData, Entity birdEntity) in SystemAPI.Query<RefRW<BirdData>>().WithEntityAccess())
         {
             DynamicBuffer<FlockBirdElement> flockMembers = SystemAPI.GetBuffer<FlockBirdElement>(birdData.ValueRO.mOwningFlock);
-            
-            int bufferLength = flockMembers.Length;
-            birdData.ValueRW.mBufferIndex = bufferLength;
-
             flockMembers.Add(birdEntity);
         }
 
