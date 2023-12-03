@@ -75,30 +75,25 @@ public struct TriggerEventsJob : ITriggerEventsJob
         }
 
         bool isPlayerEntityEyeLaser = mPlayerEyeLaserLookup.HasComponent(playerEntity);
-        //Debug.Log(isPlayerEntityEyeLaser && !mPlayerEyeLaserLookup.GetRefRO(playerEntity).ValueRO.mIsLaserActive);
-        //if (isPlayerEntityEyeLaser && !mPlayerEyeLaserLookup.GetRefRO(playerEntity).ValueRO.mIsLaserActive)
-        //{
-        //    return;
-        //}
-        Debug.Log(isPlayerEntityEyeLaser);
+        if (isPlayerEntityEyeLaser && !mPlayerEyeLaserLookup.GetRefRO(playerEntity).ValueRO.mIsLaserActive)
+        {
+            return;
+        }
+
         if (mSatelliteLookup.HasComponent(otherEntity))
         {
-            Debug.Log("Satellite");
             mSatelliteLookup.GetRefRW(otherEntity).ValueRW.mMarkedToDestroy = true;
         }
         else if (mBirdLookup.HasComponent(otherEntity))
         {
-            Debug.Log("Bird");
             mBirdLookup.GetRefRW(otherEntity).ValueRW.mMarkedToDestroy = true;
         }
         else if (mLaserLookup.HasComponent(otherEntity))
         {
-            Debug.Log("Laser");
             mLaserLookup.GetRefRW(otherEntity).ValueRW.mMarkedToDestroy = true;
         }
         else if (mRocketLookup.HasComponent(otherEntity))
         {
-            Debug.Log("Rocket");
             mRocketLookup.GetRefRW(otherEntity).ValueRW.mMarkedToDestroy = true;
         }
     }

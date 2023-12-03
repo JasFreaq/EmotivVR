@@ -47,8 +47,6 @@ public readonly partial struct PlayerEyeLaserAspect : IAspect
                 capsuleGeometry.Vertex0 = capsuleUpdatedCenter + halfAxis;
                 capsuleGeometry.Vertex1 = capsuleUpdatedCenter - halfAxis;
                 capsule->Geometry = capsuleGeometry;
-
-                Debug.DrawLine(m_transform.ValueRW.Position+capsuleUpdatedCenter + halfAxis, m_transform.ValueRW.Position + capsuleUpdatedCenter - halfAxis, Color.red, 360f);
             }
         }
     }
