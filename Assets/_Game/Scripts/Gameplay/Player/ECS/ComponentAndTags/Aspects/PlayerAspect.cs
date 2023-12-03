@@ -11,7 +11,7 @@ public readonly partial struct PlayerAspect : IAspect
 
     private readonly RefRW<LocalTransform> m_transform;
     
-    private readonly RefRO<PlayerTransformData> m_playerTransformData;
+    private readonly RefRO<PlayerCameraTransform> m_playerCameraTransform;
     
     private readonly RefRO<PlayerCameraProperties> m_playerCameraProperties;
     
@@ -25,7 +25,7 @@ public readonly partial struct PlayerAspect : IAspect
 
     public void UpdateTransform()
     {
-        m_transform.ValueRW.Position = m_playerTransformData.ValueRO.mPlayerPosition;
-        m_transform.ValueRW.Rotation = m_playerTransformData.ValueRO.mPlayerRotation;
+        m_transform.ValueRW.Position = m_playerCameraTransform.ValueRO.mPlayerCameraPosition;
+        m_transform.ValueRW.Rotation = m_playerCameraTransform.ValueRO.mPlayerCameraRotation;
     }
 }

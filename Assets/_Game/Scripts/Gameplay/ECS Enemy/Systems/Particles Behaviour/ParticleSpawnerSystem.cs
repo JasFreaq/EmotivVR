@@ -8,18 +8,21 @@ using UnityEngine;
 
 [BurstCompile]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
-public partial struct ParticleSpawnerSystem : ISystem
+public partial class ParticleSpawnerSystem : SystemBase
 {
+    private BeginSimulationEntityCommandBufferSystem m_beginSystem;
+    
     [BurstCompile]
-    public void OnCreate(ref SystemState state)
+    protected override void OnCreate()
     {
-        state.RequireForUpdate<ParticleSpawnElement>();
-    }
+        RequireForUpdate<ParticleSpawnElement>();
 
-    [BurstCompile]
-    public void OnUpdate(ref SystemState state)
+        m_beginSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>();
+    }
+    
+    protected override void OnUpdate()
     {
-        EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+        EntityCommandBuffer commandBuffer = m_beginSystem.CreateCommandBuffer();
 
         DynamicBuffer<ParticleSpawnElement> buffer = SystemAPI.GetSingletonBuffer<ParticleSpawnElement>();
 
@@ -50,7 +53,5 @@ public partial struct ParticleSpawnerSystem : ISystem
 
         buffer = SystemAPI.GetSingletonBuffer<ParticleSpawnElement>();
         buffer.Clear();
-
-        commandBuffer.Playback(state.EntityManager);
     }
 }

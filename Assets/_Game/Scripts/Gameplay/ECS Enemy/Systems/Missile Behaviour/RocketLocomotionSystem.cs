@@ -26,7 +26,7 @@ public partial struct RocketLocomotionSystem : ISystem
         Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
         MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
 
-        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
+        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerCameraTransform>();
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
         
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.TempJob);

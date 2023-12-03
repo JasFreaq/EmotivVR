@@ -8,6 +8,7 @@ using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.Windows;
 using CapsuleCollider = Unity.Physics.CapsuleCollider;
+using Color = UnityEngine.Color;
 
 public readonly partial struct PlayerEyeLaserAspect : IAspect
 {
@@ -46,6 +47,8 @@ public readonly partial struct PlayerEyeLaserAspect : IAspect
                 capsuleGeometry.Vertex0 = capsuleUpdatedCenter + halfAxis;
                 capsuleGeometry.Vertex1 = capsuleUpdatedCenter - halfAxis;
                 capsule->Geometry = capsuleGeometry;
+
+                Debug.DrawLine(m_transform.ValueRW.Position+capsuleUpdatedCenter + halfAxis, m_transform.ValueRW.Position + capsuleUpdatedCenter - halfAxis, Color.red, 360f);
             }
         }
     }

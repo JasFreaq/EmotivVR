@@ -20,7 +20,7 @@ public partial struct OrbitFollowingSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
+        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerCameraTransform>();
 
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
 

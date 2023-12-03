@@ -11,13 +11,13 @@ public partial struct PlayerUpdateSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerTransformData>();
+        state.RequireForUpdate<PlayerCameraTransform>();
     }
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
+        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerCameraTransform>();
 
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
 

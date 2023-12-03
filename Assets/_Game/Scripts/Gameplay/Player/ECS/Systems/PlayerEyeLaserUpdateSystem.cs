@@ -18,9 +18,6 @@ public partial struct PlayerEyeLaserUpdateSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
-        PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
-        
         Entity eyeLaserEntity = SystemAPI.GetSingletonEntity<PlayerEyeLaserData>();
         PlayerEyeLaserAspect eyeLaserAspect = SystemAPI.GetAspect<PlayerEyeLaserAspect>(eyeLaserEntity);
 

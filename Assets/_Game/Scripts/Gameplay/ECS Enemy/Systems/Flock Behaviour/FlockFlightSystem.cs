@@ -30,7 +30,7 @@ public partial struct FlockFlightSystem : ISystem
             flockUpdateData.ValueRW.mFireTimer += SystemAPI.Time.DeltaTime;
         }
 
-        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerTransformData>();
+        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerCameraTransform>();
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.TempJob);

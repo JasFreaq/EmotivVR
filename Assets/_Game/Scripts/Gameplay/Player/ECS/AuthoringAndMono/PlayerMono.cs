@@ -16,7 +16,7 @@ public class PlayerBaker : Baker<PlayerMono>
     {
         Entity playerEntity = GetEntity(TransformUsageFlags.Dynamic);
 
-        AddComponent<PlayerTransformData>(playerEntity);
+        AddComponent<PlayerCameraTransform>(playerEntity);
         
         AddComponent<PlayerCameraProperties>(playerEntity);
 

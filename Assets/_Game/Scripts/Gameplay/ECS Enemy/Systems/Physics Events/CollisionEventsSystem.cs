@@ -79,7 +79,7 @@ public struct CollisionEventsJob : ICollisionEventsJob
     [BurstCompile]
     public void Execute(CollisionEvent collisionEvent)
     {
-        Entity playerEntity;
+        Entity playerEntity = new Entity();
         Entity otherEntity;
 
         if (mPlayerHealthLookup.HasComponent(collisionEvent.EntityA))
@@ -87,12 +87,17 @@ public struct CollisionEventsJob : ICollisionEventsJob
             playerEntity = collisionEvent.EntityA;
             otherEntity = collisionEvent.EntityB;
         }
-        else
+        else 
         {
             playerEntity = collisionEvent.EntityB;
             otherEntity = collisionEvent.EntityA;
         }
 
+        HandlePlayerCollision(playerEntity, otherEntity);
+    }
+
+    private void HandlePlayerCollision(Entity playerEntity, Entity otherEntity)
+    {
         int damage = 0;
         if (mSatelliteLookup.HasComponent(otherEntity))
         {

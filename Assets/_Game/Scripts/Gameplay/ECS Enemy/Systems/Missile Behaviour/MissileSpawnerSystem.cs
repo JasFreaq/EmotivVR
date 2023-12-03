@@ -8,18 +8,22 @@ using UnityEngine;
 
 [BurstCompile]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
-public partial struct MissileSpawnerSystem : ISystem
+public partial class MissileSpawnerSystem : SystemBase
 {
+    private BeginSimulationEntityCommandBufferSystem m_beginSystem;
+
     [BurstCompile]
-    public void OnCreate(ref SystemState state)
+    protected override void OnCreate()
     {
-        state.RequireForUpdate<MissileSpawnElement>();
+        RequireForUpdate<MissileSpawnElement>();
+
+        m_beginSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>();
     }
 
     [BurstCompile]
-    public void OnUpdate(ref SystemState state)
+    protected override void OnUpdate()
     {
-        EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+        EntityCommandBuffer commandBuffer = m_beginSystem.CreateCommandBuffer();
 
         DynamicBuffer<MissileSpawnElement> buffer = SystemAPI.GetSingletonBuffer<MissileSpawnElement>();
 
@@ -66,7 +70,5 @@ public partial struct MissileSpawnerSystem : ISystem
 
         buffer = SystemAPI.GetSingletonBuffer<MissileSpawnElement>();
         buffer.Clear();
-
-        commandBuffer.Playback(state.EntityManager);
     }
 }
