@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
     private float m_laserTimer;
 
-    [SerializeField] private bool m_isPlayerLaserInput;
+    private bool m_isPlayerLaserInput;
 
     public bool IsPlayerLaserInput { set => m_isPlayerLaserInput = value; }
 

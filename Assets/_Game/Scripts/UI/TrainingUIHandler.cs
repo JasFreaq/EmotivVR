@@ -5,7 +5,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+using DG.Tweening;
+using static Cinemachine.DocumentationSortingAttribute;
 
 public class TrainingUIHandler : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class TrainingUIHandler : MonoBehaviour
     [System.Serializable]
     private struct ActionUIElement
     {
+        public string mActionName;
+
         public Transform mBrainmapMarker;
 
         public Image mButtonHighlightImage;
@@ -29,9 +32,14 @@ public class TrainingUIHandler : MonoBehaviour
         public TrainingThresholdElement mThresholdElement;
     }
 
+    private const float k_trainingDuration = 8f;
+
     [SerializeField] private float m_brainMapRadius = 200f;
     [SerializeField] private float m_thresholdIndicatorHalfRange = 70f;
     [SerializeField] private ActionUIElement[] m_actionUIElements;
+    [SerializeField] private float m_fadeInDuration = 2f;
+    [SerializeField] private Image m_fadeImage;
+    [SerializeField] private Slider m_trainingTimeSlider;
 
     [Header("Training Buttons")]
     [SerializeField] private Button m_loadProfileButton;
@@ -45,7 +53,18 @@ public class TrainingUIHandler : MonoBehaviour
 
     private bool m_isTraining;
 
-    public int currentActionIndex => m_currentActionIndex;
+    //public int CurrentActionIndex => m_currentActionIndex;
+
+    public string CurrentSelectedAction => m_currentActionIndex != -1
+        ? m_actionUIElements[m_currentActionIndex].mActionName : string.Empty;
+
+    public void HandleProfileLoaded()
+    {
+        m_fadeImage.DOColor(new Color(m_fadeImage.color.r, m_fadeImage.color.g, m_fadeImage.color.b, 0f), m_fadeInDuration)
+            .SetEase(Ease.InExpo).OnComplete(() => m_fadeImage.gameObject.SetActive(false));
+        
+        m_loadProfileButton.transform.parent.gameObject.SetActive(false);
+    }
 
     public void SelectAction(int actionIndex)
     {
@@ -69,64 +88,96 @@ public class TrainingUIHandler : MonoBehaviour
 
     public void SetBaseState()
     {
-        m_startButton.gameObject.SetActive(true);
-        m_eraseButton.gameObject.SetActive(true);
-        
-        m_acceptButton.gameObject.SetActive(false);
-        m_rejectButton.gameObject.SetActive(false);
+        m_startButton.transform.parent.gameObject.SetActive(true);
+        m_eraseButton.transform.parent.gameObject.SetActive(true);
+
+        m_cancelButton.transform.parent.gameObject.SetActive(false);
+
+        m_acceptButton.transform.parent.gameObject.SetActive(false);
+        m_rejectButton.transform.parent.gameObject.SetActive(false);
 
         DisableTrainingThresholdElement();
 
         m_isTraining = false;
+
+        m_trainingTimeSlider.DOKill();
+        m_trainingTimeSlider.value = 0f;
+        m_trainingTimeSlider.gameObject.SetActive(false);
     }
     
     public void SetTrainingState()
     {
-        m_startButton.gameObject.SetActive(false);
-        m_eraseButton.gameObject.SetActive(false);
+        m_startButton.transform.parent.gameObject.SetActive(false);
+        m_eraseButton.transform.parent.gameObject.SetActive(false);
 
-        m_cancelButton.gameObject.SetActive(true);
+        m_cancelButton.transform.parent.gameObject.SetActive(true);
+
+        m_trainingTimeSlider.DOValue(1f, k_trainingDuration).SetEase(Ease.Linear);
+        m_trainingTimeSlider.gameObject.SetActive(true);
 
         m_isTraining = true;
     }
 
     public void SetTrainedState()
     {
-        m_cancelButton.gameObject.SetActive(false);
+        m_cancelButton.transform.parent.gameObject.SetActive(false);
 
-        m_acceptButton.gameObject.SetActive(true);
-        m_rejectButton.gameObject.SetActive(true);
+        m_acceptButton.transform.parent.gameObject.SetActive(true);
+        m_rejectButton.transform.parent.gameObject.SetActive(true);
     }
 
-    public void EnableAllActions()
+    public void EnableActionOptions(bool enable = true)
     {
         for (int i = 1, l = m_actionUIElements.Length; i < l; i++)
         {
             ActionUIElement actionElement = m_actionUIElements[i];
-            actionElement.mButtonHighlightImage.gameObject.SetActive(true);
+            actionElement.mButtonHighlightImage.gameObject.SetActive(enable);
         }
     }
 
-    public void UpdateSkillLevel(int index, int level)
+    public void UpdateSkillLevel(Dictionary<string, int> actionsDict)
     {
-        TextMeshProUGUI skillLevelText = m_actionUIElements[index].mSkillLevelText;
-        skillLevelText.text = level.ToString();
+        foreach (ActionUIElement action in m_actionUIElements)
+        {
+            TextMeshProUGUI skillLevelText = action.mSkillLevelText;
+            
+            if (actionsDict.ContainsKey(action.mActionName))
+            {
+                skillLevelText.text = actionsDict[action.mActionName].ToString();
+            }
+            else
+            {
+                skillLevelText.text = "0";
+            }
+        }
     }
     
-    public void UpdateBrainMarkers(int index, Vector2 coordinates)
+    public void UpdateBrainMarkers(string actionName, Vector2 coordinates)
     {
-        Transform brainmapMarker = m_actionUIElements[index].mBrainmapMarker;
+        foreach (ActionUIElement action in m_actionUIElements)
+        {
+            if (actionName == action.mActionName)
+            {
+                Transform brainmapMarker = action.mBrainmapMarker;
 
-        float radius = Mathf.Sqrt(coordinates.x * coordinates.x + coordinates.y * coordinates.y) * m_brainMapRadius;
-        float angle = Mathf.Atan2(coordinates.y, coordinates.x);
+                if (coordinates != Vector2.zero || action.mActionName == "neutral")
+                {
+                    float radius = Mathf.Sqrt(coordinates.x * coordinates.x + coordinates.y * coordinates.y) *
+                                   m_brainMapRadius;
+                    float angle = Mathf.Atan2(coordinates.y, coordinates.x) * 2;
 
-        float newRadius = 2 * angle;
+                    Vector2 newCoordinates = new Vector2(radius * Mathf.Cos(angle), radius * Mathf.Sin(angle));
+                    brainmapMarker.localPosition = newCoordinates;
 
-        Vector2 newCoordinates = new Vector2(radius * Mathf.Cos(angle), radius * Mathf.Sin(angle));
-        brainmapMarker.localPosition = newCoordinates;
-
-        if (!brainmapMarker.gameObject.activeSelf)
-            brainmapMarker.gameObject.SetActive(true);
+                    if (!brainmapMarker.gameObject.activeSelf)
+                        brainmapMarker.gameObject.SetActive(true);
+                }
+                else
+                {
+                    brainmapMarker.gameObject.SetActive(false);
+                }
+            }
+        }
     }
 
     public void EnableTrainingThresholdElement(float currentThreshold, float lastTrainingScore)

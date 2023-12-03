@@ -5,15 +5,14 @@ using EmotivVR;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using Unity.Entities.UniversalDelegates;
 
 public class EmotivTrainingInterfacer : MonoBehaviour
 {
     [SerializeField] private ApplicationConfiguration m_appConfig;
 
     [SerializeField] private TrainingUIHandler m_trainingUI;
-
-    [SerializeField] private string[] m_actionNames;
-
+    
     private EmotivUnityItf m_emotivInterface = EmotivUnityItf.Instance;
 
     private PlayerTrainingWrapper m_playerTrainingWrapper;
@@ -22,7 +21,7 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
     private const bool k_IsDataBufferUsing = false; // default subscribed data will not saved to Data buffer
 
-    private const string k_ProfileName = "Default"; // default profile name for playtesting
+    private const string k_ProfileName = "LaserKnight"; // default profile name for playtesting
 
     private Queue<SystemEvent> m_sysEventQueue = new Queue<SystemEvent>();
 
@@ -53,11 +52,6 @@ public class EmotivTrainingInterfacer : MonoBehaviour
             k_IsDataBufferUsing);
         
         m_emotivInterface.Start();
-
-        foreach (string actionName in m_actionNames)
-        {
-            m_signatureActionsDict.Add(actionName, 0);
-        }
     }
 
     private void OnEnable()
@@ -66,8 +60,8 @@ public class EmotivTrainingInterfacer : MonoBehaviour
         {
             if (m_emotivInterface.IsProfileLoaded)
             {
-                if (m_trainingUI.currentActionIndex != -1)
-                    m_emotivInterface.StartMCTraining(m_actionNames[m_trainingUI.currentActionIndex]);
+                if (m_trainingUI.CurrentSelectedAction != string.Empty)
+                    m_emotivInterface.StartMCTraining(m_trainingUI.CurrentSelectedAction);
             }
         });
         
@@ -75,15 +69,15 @@ public class EmotivTrainingInterfacer : MonoBehaviour
         {
             if (m_emotivInterface.IsProfileLoaded)
             {
-                if (m_trainingUI.currentActionIndex != -1)
-                    m_emotivInterface.EraseMCTraining(m_actionNames[m_trainingUI.currentActionIndex]);
+                if (m_trainingUI.CurrentSelectedAction != string.Empty)
+                    m_emotivInterface.EraseMCTraining(m_trainingUI.CurrentSelectedAction);
             }
         });
         
         m_trainingUI.SubscribeToCancelButton(() =>
         {
             if (m_emotivInterface.IsProfileLoaded)
-                m_emotivInterface.ResetMCTraining(m_actionNames[m_trainingUI.currentActionIndex]);
+                m_emotivInterface.ResetMCTraining(m_trainingUI.CurrentSelectedAction);
         });
         
         m_trainingUI.SubscribeToAcceptButton(() =>
@@ -109,7 +103,6 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
             if (!m_emotivInterface.IsSessionCreated)
             {
-                //TODO: Add training splash screen with 'create session' button. Link CreateSession to said button and Enable said button here
                 m_emotivInterface.CreateSessionWithHeadset("");
             }
 
@@ -135,6 +128,8 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
             if (!m_isProfileLoaded && m_emotivInterface.IsProfileLoaded)
             {
+                m_trainingUI.HandleProfileLoaded();
+
                 m_emotivInterface.GetMCTrainedSignatureActions(k_ProfileName);
                 m_emotivInterface.GetMCBrainMap(k_ProfileName);
 
@@ -218,6 +213,11 @@ public class EmotivTrainingInterfacer : MonoBehaviour
                 break;
 
             case SystemEvent.MC_DataErased:
+                m_signatureActionsDict[m_trainingUI.CurrentSelectedAction] = 0;
+
+                m_emotivInterface.GetMCTrainedSignatureActions(k_ProfileName);
+                m_emotivInterface.GetMCBrainMap(k_ProfileName);
+
                 m_emotivInterface.SaveProfile(k_ProfileName);
                 break;
 
@@ -231,6 +231,7 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
                 m_emotivInterface.GetMCTrainedSignatureActions(k_ProfileName);
                 m_emotivInterface.GetMCBrainMap(k_ProfileName);
+
                 m_emotivInterface.SaveProfile(k_ProfileName);
                 break;
 
@@ -259,24 +260,24 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     private void ProcessTrainedSignatureActions(JObject result)
     {
         JArray trainedActions = result["trainedActions"].Value<JArray>();
-
-        for (int i = 0, l = trainedActions.Count; i < l; i++) 
+        
+        foreach (JToken trainedAction in trainedActions)
         {
-            string actionName = trainedActions[i]["action"].Value<string>();
+            string actionName = trainedAction["action"].Value<string>();
+            int skillLevel = trainedAction["times"].Value<int>();
 
-            if (!m_checkedSignatureActionOnLoad || actionName == m_actionNames[m_trainingUI.currentActionIndex]) 
-            {
-                int skillLevel = trainedActions[i]["times"].Value<int>();
-
-                m_signatureActionsDict[actionName] = skillLevel;
-
-                m_trainingUI.UpdateSkillLevel(i, skillLevel);
-            }
+            m_signatureActionsDict[actionName] = skillLevel;
         }
 
-        if (m_signatureActionsDict["neutral"] >= 1)
+        m_trainingUI.UpdateSkillLevel(m_signatureActionsDict);
+
+        if (m_signatureActionsDict.ContainsKey("neutral") && m_signatureActionsDict["neutral"] >= 1)
         {
-            m_trainingUI.EnableAllActions();
+            m_trainingUI.EnableActionOptions();
+        }
+        else 
+        {
+            m_trainingUI.EnableActionOptions(false);
         }
 
         if (!m_checkedSignatureActionOnLoad)
@@ -290,38 +291,29 @@ public class EmotivTrainingInterfacer : MonoBehaviour
             foreach (JToken mapValue in result)
             {
                 string actionName = mapValue["action"].Value<string>();
-
-                int actionIndex = -1;
-                for (int i = 0, l = m_actionNames.Length; i < l; i++)
-                {
-                    if (actionName == m_actionNames[i])
-                    {
-                        actionIndex = i;
-                    }
-                }
-
+                
                 JArray coordinatesArray = (JArray)mapValue["coordinates"];
                 float[] coordinates = coordinatesArray.ToObject<float[]>();
 
                 Vector2 coordinatesVector = new Vector2(coordinates[0], coordinates[1]);
-                m_trainingUI.UpdateBrainMarkers(actionIndex, coordinatesVector);
+                m_trainingUI.UpdateBrainMarkers(actionName, coordinatesVector);
             }
         }
         else if (m_signatureActionsDict.ContainsKey("neutral"))
         {
             Vector2 coordinatesVector = new Vector2(0f, 0f);
-            m_trainingUI.UpdateBrainMarkers(0, coordinatesVector);
+            m_trainingUI.UpdateBrainMarkers("neutral", coordinatesVector);
         }
     }
 
     private void ProcessCommandTrainingThreshold(JObject result)
     {
-        if (m_trainingUI.currentActionIndex != 0)
+        if (m_trainingUI.CurrentSelectedAction != "neutral")
         {
             float currentThreshold = result["currentThreshold"].Value<float>();
             float lastTrainingScore = result["lastTrainingScore"].Value<float>();
 
-            string actionName = m_actionNames[m_trainingUI.currentActionIndex];
+            string actionName = m_trainingUI.CurrentSelectedAction;
             if (m_signatureActionsDict.ContainsKey(actionName) && m_signatureActionsDict[actionName] > 1)
             {
                 m_trainingUI.EnableTrainingThresholdElement(currentThreshold, lastTrainingScore);

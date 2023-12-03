@@ -7,6 +7,7 @@ public class PlayerEcsLiaison : MonoBehaviour
 {
     [SerializeField] private Transform m_eyeLaserTransform;
     [SerializeField] private Transform m_swordTransform;
+    [SerializeField] private Transform m_shieldTransform;
 
     private Transform m_mainCameraTransform;
 
@@ -19,6 +20,7 @@ public class PlayerEcsLiaison : MonoBehaviour
     
     private EntityQuery m_eyeLaserQuery;
     private EntityQuery m_swordQuery;
+    private EntityQuery m_shieldQuery;
 
     private bool m_addedCameraDetails;
 
@@ -38,6 +40,7 @@ public class PlayerEcsLiaison : MonoBehaviour
         
         m_eyeLaserQuery = m_entityManager.CreateEntityQuery(typeof(PlayerEyeLaserData));
         m_swordQuery = m_entityManager.CreateEntityQuery(typeof(PlayerSwordTransform));
+        m_shieldQuery = m_entityManager.CreateEntityQuery(typeof(PlayerShieldTransform));
     }
     
     private void Update()
@@ -87,6 +90,14 @@ public class PlayerEcsLiaison : MonoBehaviour
             playerSwordTransform.mPlayerSwordRotation = m_swordTransform.rotation;
 
             m_swordQuery.SetSingleton(playerSwordTransform);
+        }
+        
+        if (m_shieldQuery.TryGetSingleton(out PlayerShieldTransform playerShieldTransform))
+        {
+            playerShieldTransform.mPlayerShieldPosition = m_shieldTransform.position;
+            playerShieldTransform.mPlayerShieldRotation = m_shieldTransform.rotation;
+
+            m_shieldQuery.SetSingleton(playerShieldTransform);
         }
     }
 }
