@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-public struct MissileCache : IComponentData
+public struct EnemyElementsCache : IComponentData
 {
     public float mLaserLifetime;
     public float mLaserSpeed;
@@ -14,4 +14,7 @@ public struct MissileCache : IComponentData
     public int mRocketDamage;
 
     public int mShipDamage;
+
+    public int mSatelliteScore;
+    public int mBirdScore;
 }

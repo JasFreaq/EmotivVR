@@ -16,7 +16,7 @@ public partial struct CollisionEventsSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<MissileCache>();
+        state.RequireForUpdate<EnemyElementsCache>();
         state.RequireForUpdate<PlayerHealthData>();
         state.RequireForUpdate<SimulationSingleton>();
     }
@@ -24,17 +24,17 @@ public partial struct CollisionEventsSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
-        MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
+        EnemyElementsCacheAspect enemyElementsCacheAspect = SystemAPI.GetAspect<EnemyElementsCacheAspect>(missileCacheEntity);
 
         Entity particlesCacheEntity = SystemAPI.GetSingletonEntity<ParticlesCache>();
         ParticlesCacheAspect particlesCacheAspect = SystemAPI.GetAspect<ParticlesCacheAspect>(particlesCacheEntity);
         
         CollisionEventsJob collisionJob = new CollisionEventsJob
         {
-            mLaserDamage = missileCacheAspect.LaserDamage,
-            mRocketDamage = missileCacheAspect.RocketDamage,
-            mShipDamage = missileCacheAspect.ShipDamage,
+            mLaserDamage = enemyElementsCacheAspect.LaserDamage,
+            mRocketDamage = enemyElementsCacheAspect.RocketDamage,
+            mShipDamage = enemyElementsCacheAspect.ShipDamage,
             mExplosionLifetime = particlesCacheAspect.TinyExplosionLifetime,
             mExplosionParticles = particlesCacheAspect.TinyExplosion,
             mPlayerHealthLookup = SystemAPI.GetComponentLookup<PlayerHealthData>(),
@@ -56,7 +56,7 @@ public struct CollisionEventsJob : ICollisionEventsJob
     public int mRocketDamage;
     
     public int mShipDamage;
-
+    
     public float mExplosionLifetime;
     
     public Entity mExplosionParticles;
@@ -79,7 +79,7 @@ public struct CollisionEventsJob : ICollisionEventsJob
     [BurstCompile]
     public void Execute(CollisionEvent collisionEvent)
     {
-        Entity playerEntity = new Entity();
+        Entity playerEntity;
         Entity otherEntity;
 
         if (mPlayerHealthLookup.HasComponent(collisionEvent.EntityA))

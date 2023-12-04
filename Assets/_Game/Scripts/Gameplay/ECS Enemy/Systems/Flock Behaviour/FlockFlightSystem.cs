@@ -40,7 +40,7 @@ public partial struct FlockFlightSystem : ISystem
             mDeltaTime = SystemAPI.Time.DeltaTime,
             mTime = (float)SystemAPI.Time.ElapsedTime,
             mPlayerPosition = playerAspect.Transform.Position,
-            mMissileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>(),
+            mMissileCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>(),
             mParticlesCacheEntity = SystemAPI.GetSingletonEntity<ParticlesCache>(),
             mLocalToWorldLookup = state.GetComponentLookup<LocalToWorld>(true),
             mFlockPropertiesLookup = state.GetComponentLookup<FlockProperties>(true),
@@ -202,20 +202,6 @@ public partial struct FlockFlightJob : IJobEntity
                 flockUpdate.ValueRW.mRocketsFired++;
                 flockUpdate.ValueRW.mLastFireTime = mTime;
             }
-
-            //LocalTransform spawnTransform = new LocalTransform
-            //{
-            //    Position = transform.Position,
-            //    Rotation = transform.Rotation,
-            //    Scale = 1f
-            //};
-            //mParallelCommandBuffer.SetComponent(sortKey, rocketEntity, spawnTransform);
-
-            //RocketData rocketData = new RocketData
-            //{
-            //    mLifetimeCounter = mRocketLifetime
-            //};
-            //mParallelCommandBuffer.AddComponent(sortKey, rocketEntity, rocketData);
         }
     }
 

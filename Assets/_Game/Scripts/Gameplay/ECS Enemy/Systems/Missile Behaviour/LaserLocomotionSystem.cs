@@ -21,15 +21,15 @@ public partial struct LaserLocomotionSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
-        MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
+        EnemyElementsCacheAspect enemyElementsCacheAspect = SystemAPI.GetAspect<EnemyElementsCacheAspect>(missileCacheEntity);
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         LaserLocomotionJob laserLocomotionJob = new LaserLocomotionJob
         {
             mDeltaTime = SystemAPI.Time.DeltaTime,
-            mSpeed = missileCacheAspect.LaserSpeed,
+            mSpeed = enemyElementsCacheAspect.LaserSpeed,
             mParallelCommandBuffer = commandBuffer.AsParallelWriter()
         };
 

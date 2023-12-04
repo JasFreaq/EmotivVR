@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerTrainingWrapper : MonoBehaviour
+public class PlayerInputWrapper : MonoBehaviour
 {
     [SerializeField] private PlayerController m_playerController;
 
@@ -18,10 +18,5 @@ public class PlayerTrainingWrapper : MonoBehaviour
     public void EnqueuePlayerMovementInput(float input)
     {
         m_playerController.EnqueueMovementInput(input);
-    }
-
-    public void ResetPlayerPosition()
-    {
-        m_playerController.transform.position = m_playerinitialPosition;
     }
 }

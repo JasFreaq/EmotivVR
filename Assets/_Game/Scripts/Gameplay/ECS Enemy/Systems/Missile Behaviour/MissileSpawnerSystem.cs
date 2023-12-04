@@ -7,28 +7,24 @@ using Unity.Transforms;
 using UnityEngine;
 
 [BurstCompile]
-[UpdateInGroup(typeof(SimulationSystemGroup))]
-public partial class MissileSpawnerSystem : SystemBase
+[UpdateInGroup(typeof(InitializationSystemGroup))]
+public partial struct MissileSpawnerSystem : ISystem
 {
-    private BeginSimulationEntityCommandBufferSystem m_beginSystem;
-
     [BurstCompile]
-    protected override void OnCreate()
+    public void OnCreate(ref SystemState state)
     {
-        RequireForUpdate<MissileSpawnElement>();
-
-        m_beginSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>();
+        state.RequireForUpdate<MissileSpawnElement>();
     }
 
     [BurstCompile]
-    protected override void OnUpdate()
+    public void OnUpdate(ref SystemState state)
     {
-        EntityCommandBuffer commandBuffer = m_beginSystem.CreateCommandBuffer();
+        EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
         DynamicBuffer<MissileSpawnElement> buffer = SystemAPI.GetSingletonBuffer<MissileSpawnElement>();
 
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
-        MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
+        EnemyElementsCacheAspect enemyElementsCacheAspect = SystemAPI.GetAspect<EnemyElementsCacheAspect>(missileCacheEntity);
 
         for (int i = 0, l = buffer.Length; i < l; i++)
         {
@@ -41,19 +37,19 @@ public partial class MissileSpawnerSystem : SystemBase
             switch (missileSpawn.mMissileType)
             {
                 case MissileType.Laser:
-                    missileEntity = commandBuffer.Instantiate(missileCacheAspect.GetRandomLaser());
+                    missileEntity = commandBuffer.Instantiate(enemyElementsCacheAspect.GetRandomLaser());
                     LaserData laserData = new LaserData
                     {
-                        mLifetimeCounter = missileCacheAspect.LaserLifetime
+                        mLifetimeCounter = enemyElementsCacheAspect.LaserLifetime
                     };
                     commandBuffer.AddComponent(missileEntity, laserData);
                     break;
 
                 case MissileType.Rocket:
-                    missileEntity = commandBuffer.Instantiate(missileCacheAspect.GetRandomRocket());
+                    missileEntity = commandBuffer.Instantiate(enemyElementsCacheAspect.GetRandomRocket());
                     RocketData rocketData = new RocketData
                     {
-                        mLifetimeCounter = missileCacheAspect.RocketLifetime
+                        mLifetimeCounter = enemyElementsCacheAspect.RocketLifetime
                     };
                     commandBuffer.AddComponent(missileEntity, rocketData);
                     break;
@@ -70,5 +66,7 @@ public partial class MissileSpawnerSystem : SystemBase
 
         buffer = SystemAPI.GetSingletonBuffer<MissileSpawnElement>();
         buffer.Clear();
+
+        commandBuffer.Playback(state.EntityManager);
     }
 }

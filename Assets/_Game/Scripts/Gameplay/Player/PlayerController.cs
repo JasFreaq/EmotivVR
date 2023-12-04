@@ -5,9 +5,11 @@ using UnityEngine.Windows;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float m_playerSpeed = 10f;
+    [SerializeField] private float m_playerSpeed = 50f;
     [SerializeField] private float[] m_laserTimes;
     [SerializeField] private EyeLaserHandler m_eyeLaser;
+
+    private Transform m_cameraTransform;
 
     private Rigidbody m_rigidbody;
 
@@ -32,6 +34,8 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        m_cameraTransform = Camera.main.transform;
+
         foreach (float time in m_laserTimes)
         {
             m_totalLaserTime += time;
@@ -88,11 +92,11 @@ public class PlayerController : MonoBehaviour
         {
             float input = m_inputQueue.Dequeue();
             
-            m_rigidbody.velocity = Vector3.forward * m_playerSpeed * input * Time.deltaTime;
+            m_rigidbody.velocity = m_cameraTransform.forward * m_playerSpeed * input * Time.deltaTime;
         }
         else
         {
-            m_rigidbody.velocity = Vector3.forward * Mathf.Lerp(m_rigidbody.velocity.magnitude, 0f, Time.deltaTime);
+            m_rigidbody.velocity = m_cameraTransform.forward * Mathf.Lerp(m_rigidbody.velocity.magnitude, 0f, Time.deltaTime);
         }
     }
 

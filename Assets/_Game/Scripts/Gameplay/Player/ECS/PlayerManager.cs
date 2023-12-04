@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-public class PlayerEcsLiaison : MonoBehaviour
+public class PlayerManager : MonoBehaviour
 {
     [SerializeField] private Transform m_eyeLaserTransform;
     [SerializeField] private Transform m_swordTransform;
     [SerializeField] private Transform m_shieldTransform;
+
+    [SerializeField] private int m_playerInitialHealth = 200;
+    [SerializeField] private PlayerHUDHandler m_playerHUD;
 
     private Transform m_mainCameraTransform;
 
@@ -21,8 +24,13 @@ public class PlayerEcsLiaison : MonoBehaviour
     private EntityQuery m_eyeLaserQuery;
     private EntityQuery m_swordQuery;
     private EntityQuery m_shieldQuery;
+    
+    private EntityQuery m_healthQuery;
+    private EntityQuery m_scoreQuery;
 
     private bool m_addedCameraDetails;
+
+    private int m_totalScore;
 
     private void Awake()
     {
@@ -41,6 +49,9 @@ public class PlayerEcsLiaison : MonoBehaviour
         m_eyeLaserQuery = m_entityManager.CreateEntityQuery(typeof(PlayerEyeLaserData));
         m_swordQuery = m_entityManager.CreateEntityQuery(typeof(PlayerSwordTransform));
         m_shieldQuery = m_entityManager.CreateEntityQuery(typeof(PlayerShieldTransform));
+        
+        m_healthQuery = m_entityManager.CreateEntityQuery(typeof(PlayerHealthData));
+        m_scoreQuery = m_entityManager.CreateEntityQuery(typeof(ScoreDataElement));
     }
     
     private void Update()
@@ -98,6 +109,23 @@ public class PlayerEcsLiaison : MonoBehaviour
             playerShieldTransform.mPlayerShieldRotation = m_shieldTransform.rotation;
 
             m_shieldQuery.SetSingleton(playerShieldTransform);
+        }
+
+        if (m_healthQuery.TryGetSingleton(out PlayerHealthData playerHealthData))
+        {
+            float ratio = (float)playerHealthData.mPlayerHealth / m_playerInitialHealth;
+            m_playerHUD.UpdateHealth(ratio);
+        }
+
+        if (m_scoreQuery.TryGetSingletonBuffer(out DynamicBuffer<ScoreDataElement> scoreBuffer))
+        {
+            foreach (ScoreDataElement scoreDataElement in scoreBuffer)
+            {
+                m_totalScore += scoreDataElement.mScoreIncrement;
+            }
+
+            m_playerHUD.UpdateScore(m_totalScore);
+            scoreBuffer.Clear();
         }
     }
 }

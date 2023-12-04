@@ -23,8 +23,8 @@ public partial struct RocketLocomotionSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
-        MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
+        EnemyElementsCacheAspect enemyElementsCacheAspect = SystemAPI.GetAspect<EnemyElementsCacheAspect>(missileCacheEntity);
 
         Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerCameraTransform>();
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
@@ -34,7 +34,7 @@ public partial struct RocketLocomotionSystem : ISystem
         RocketLocomotionJob rocketLocomotionJob = new RocketLocomotionJob
         {
             mDeltaTime = SystemAPI.Time.DeltaTime,
-            mSpeed = missileCacheAspect.RocketSpeed,
+            mSpeed = enemyElementsCacheAspect.RocketSpeed,
             mPlayerPosition = playerAspect.Transform.Position,
             mParticlesCacheEntity = SystemAPI.GetSingletonEntity<ParticlesCache>(),
             mParticleSpawnBuffer = SystemAPI.GetBufferLookup<ParticleSpawnElement>(),

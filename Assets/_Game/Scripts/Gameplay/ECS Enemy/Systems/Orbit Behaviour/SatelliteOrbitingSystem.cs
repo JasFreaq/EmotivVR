@@ -29,8 +29,8 @@ public partial struct SatelliteOrbitingSystem : ISystem
             orbitUpdateData.ValueRW.mFireTimer += SystemAPI.Time.DeltaTime;
         }
 
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
-        MissileCacheAspect missileCacheAspect = SystemAPI.GetAspect<MissileCacheAspect>(missileCacheEntity);
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
+        EnemyElementsCacheAspect enemyElementsCacheAspect = SystemAPI.GetAspect<EnemyElementsCacheAspect>(missileCacheEntity);
 
         Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerCameraTransform>();
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);
@@ -41,7 +41,7 @@ public partial struct SatelliteOrbitingSystem : ISystem
         {
             mDeltaTime = SystemAPI.Time.DeltaTime,
             mTime = (float)SystemAPI.Time.ElapsedTime,
-            mMissileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>(),
+            mMissileCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>(),
             mParticlesCacheEntity = SystemAPI.GetSingletonEntity<ParticlesCache>(),
             mPlayerTransform = playerAspect.Transform,
             mCameraProperties = playerAspect.CameraProperties,

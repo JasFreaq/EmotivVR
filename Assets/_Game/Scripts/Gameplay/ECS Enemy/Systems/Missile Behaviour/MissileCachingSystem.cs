@@ -18,7 +18,7 @@ public partial struct MissileCachingSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<MissileCache>();
+        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
         
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         

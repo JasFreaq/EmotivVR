@@ -24,5 +24,7 @@ public class PlayerBaker : Baker<PlayerMono>
         {
             mPlayerHealth = authoring.PlayerStartingHealth
         });
+
+        AddComponent<ScoreDataElement>(playerEntity);
     }
 }

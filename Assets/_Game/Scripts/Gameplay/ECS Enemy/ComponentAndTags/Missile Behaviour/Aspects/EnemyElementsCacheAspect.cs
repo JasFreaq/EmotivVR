@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-public readonly partial struct MissileCacheAspect : IAspect
+public readonly partial struct EnemyElementsCacheAspect : IAspect
 {
     public readonly Entity mEntity;
 
-    private readonly RefRO<MissileCache> m_missileCache;
+    private readonly RefRO<EnemyElementsCache> m_enemyElementsCache;
 
     private readonly DynamicBuffer<MissileLaserElement> m_laserPrefabsBuffer;
     
@@ -15,19 +15,23 @@ public readonly partial struct MissileCacheAspect : IAspect
 
     private readonly RefRW<MissileRandomUtility> m_missileRandom;
 
-    public float LaserLifetime => m_missileCache.ValueRO.mLaserLifetime;
+    public float LaserLifetime => m_enemyElementsCache.ValueRO.mLaserLifetime;
     
-    public float LaserSpeed => m_missileCache.ValueRO.mLaserSpeed;
+    public float LaserSpeed => m_enemyElementsCache.ValueRO.mLaserSpeed;
     
-    public int LaserDamage => m_missileCache.ValueRO.mLaserDamage;
+    public int LaserDamage => m_enemyElementsCache.ValueRO.mLaserDamage;
     
-    public float RocketLifetime => m_missileCache.ValueRO.mRocketLifetime;
+    public float RocketLifetime => m_enemyElementsCache.ValueRO.mRocketLifetime;
     
-    public float RocketSpeed => m_missileCache.ValueRO.mRocketSpeed;
+    public float RocketSpeed => m_enemyElementsCache.ValueRO.mRocketSpeed;
     
-    public int RocketDamage => m_missileCache.ValueRO.mRocketDamage;
+    public int RocketDamage => m_enemyElementsCache.ValueRO.mRocketDamage;
     
-    public int ShipDamage => m_missileCache.ValueRO.mShipDamage;
+    public int ShipDamage => m_enemyElementsCache.ValueRO.mShipDamage;
+
+    public int SatelliteScore => m_enemyElementsCache.ValueRO.mSatelliteScore;
+
+    public int BirdScore => m_enemyElementsCache.ValueRO.mBirdScore;
 
     public Entity GetRandomLaser()
     {

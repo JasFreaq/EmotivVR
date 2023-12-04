@@ -41,7 +41,7 @@ public class MissileCacheBaker : Baker<MissileCacheMono>
     {
         Entity missileCacheEntity = GetEntity(TransformUsageFlags.None);
 
-        AddComponent(missileCacheEntity, new MissileCache
+        AddComponent(missileCacheEntity, new EnemyElementsCache
         {
             mLaserLifetime = authoring.LaserLifetime,
             mLaserSpeed = authoring.LaserSpeed,

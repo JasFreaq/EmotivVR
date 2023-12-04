@@ -15,7 +15,7 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     
     private EmotivUnityItf m_emotivInterface = EmotivUnityItf.Instance;
 
-    private PlayerTrainingWrapper m_playerTrainingWrapper;
+    private PlayerInputWrapper m_playerInputWrapper;
 
     private const float k_TimeUpdateData = 1f;
 
@@ -38,12 +38,10 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     private bool m_isSessionCreated;
     
     private bool m_isProfileLoaded;
-
-    private bool m_checkedSignatureActionOnLoad;
-
+    
     private void Awake()
     {
-        m_playerTrainingWrapper = GetComponent<PlayerTrainingWrapper>();
+        m_playerInputWrapper = GetComponent<PlayerInputWrapper>();
     }
 
     private void Start()
@@ -193,15 +191,23 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     
     private void OnMentalCommandReceived(MentalCommandEventArgs data)
     {
+        if (m_trainingUI.IsTraining)
+        {
+            if (data.Act != m_trainingUI.CurrentSelectedAction)
+                return;
+        }
+
         if (data.Act == "pull")
         {
-            m_playerTrainingWrapper.EnqueuePlayerMovementInput((float)data.Pow);
+            m_playerInputWrapper.EnqueuePlayerMovementInput((float)data.Pow);
         }
+        
+        m_playerInputWrapper.IsPlayerLaserInput = data.Act == "push";
     }
 
-    private void ProcessSystemEvent(SystemEvent mentalEvent)
+    private void ProcessSystemEvent(SystemEvent sysEvent)
     {
-        switch (mentalEvent)
+        switch (sysEvent)
         {
             case SystemEvent.MC_Started:
                 m_trainingUI.SetTrainingState();
@@ -227,7 +233,6 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
             case SystemEvent.MC_Completed:
                 m_trainingUI.SetBaseState();
-                m_playerTrainingWrapper.ResetPlayerPosition();
 
                 m_emotivInterface.GetMCTrainedSignatureActions(k_ProfileName);
                 m_emotivInterface.GetMCBrainMap(k_ProfileName);
@@ -237,7 +242,6 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
             case SystemEvent.MC_Rejected:
                 m_trainingUI.SetBaseState();
-                m_playerTrainingWrapper.ResetPlayerPosition();
                 break;
         }
     }
@@ -279,9 +283,6 @@ public class EmotivTrainingInterfacer : MonoBehaviour
         {
             m_trainingUI.EnableActionOptions(false);
         }
-
-        if (!m_checkedSignatureActionOnLoad)
-            m_checkedSignatureActionOnLoad = true;
     }
 
     private void ProcessMentalCommandBrainMap(JArray result)

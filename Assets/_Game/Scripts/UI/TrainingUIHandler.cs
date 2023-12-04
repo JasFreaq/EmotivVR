@@ -52,11 +52,11 @@ public class TrainingUIHandler : MonoBehaviour
     private int m_currentActionIndex = -1;
 
     private bool m_isTraining;
-
-    //public int CurrentActionIndex => m_currentActionIndex;
-
+    
     public string CurrentSelectedAction => m_currentActionIndex != -1
         ? m_actionUIElements[m_currentActionIndex].mActionName : string.Empty;
+
+    public bool IsTraining => m_isTraining;
 
     public void HandleProfileLoaded()
     {
