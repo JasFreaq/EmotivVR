@@ -9,6 +9,7 @@ using Random = Unity.Mathematics.Random;
 
 [BurstCompile]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
+[UpdateAfter(typeof(ShipCachingSystem))]
 public partial struct OrbitSpawnerSystem : ISystem
 {
     [BurstCompile]
@@ -55,6 +56,11 @@ public partial struct OrbitSpawnerSystem : ISystem
             float satelliteSpeed = orbitSpawnerAspect.GetRandomSatelliteSpeed();
             int satelliteCount = orbitSpawnerAspect.GetRandomSatelliteCount();
 
+            Entity enemyElementsCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
+            DynamicBuffer<SatellitePrefabElement> satellitePrefabsBuffer = SystemAPI.GetBuffer<SatellitePrefabElement>(enemyElementsCacheEntity);
+            int satelliteBufferLength = satellitePrefabsBuffer.Length;
+            Entity satellitePrefabEntity = satellitePrefabsBuffer[orbitSpawnerAspect.GetRandomIndex(satelliteBufferLength)].mSatellitePrefab;
+
             OrbitProperties orbitProperties = new OrbitProperties
             {
                 mOrbitSpawner = orbitSpawnerAspect.mEntity,
@@ -80,7 +86,7 @@ public partial struct OrbitSpawnerSystem : ISystem
                 mSatellitePerUnitTime = satelliteCount / (360f / satelliteSpeed),
                 mSpawnTimeCounter = 0,
                 mOrbitMemberHalfBounds = orbitSpawnerAspect.GetRandomOrbitMemberHalfBounds(),
-                mSatellitePrefab = orbitSpawnerAspect.SatellitePrefab,
+                mSatellitePrefab = satellitePrefabEntity,
                 mRand = Random.CreateFromIndex(orbitSpawnerAspect.GetRandomSeed())
             };
             commandBuffer.AddComponent(orbitEntity, orbitSpawnData);

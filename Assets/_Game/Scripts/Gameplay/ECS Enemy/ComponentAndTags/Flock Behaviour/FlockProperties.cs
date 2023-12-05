@@ -6,6 +6,8 @@ using UnityEngine;
 
 public struct FlockProperties : IComponentData
 {
+    public Entity mFlockSpawner;
+
     public int mFlockSize;
 
     public float mBirdSpeed;
@@ -15,5 +17,4 @@ public struct FlockProperties : IComponentData
     public float mFireRateTime;
     
     public float mSeparationRadius;
-    public float mSeekWeight;
 }

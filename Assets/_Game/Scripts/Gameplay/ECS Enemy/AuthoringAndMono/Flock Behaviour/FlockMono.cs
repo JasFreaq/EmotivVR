@@ -12,8 +12,7 @@ public class FlockMono : MonoBehaviour
     [SerializeField] [Range(1, 63)] private int m_flockSize = 50;
     [SerializeField] private float3 m_flockSpawnBounds = new float3(10f, 10f, 10f);
     [SerializeField] private float3 m_flockSpreadRange = new float3(8f, 2f, 7f);
-    [SerializeField] private float m_separationRadius = 8f;
-    [SerializeField] [Range(0f, 1f)] private float m_seekWeight = 1f;
+    [SerializeField] private float m_separationRadius = 16f;
     [SerializeField] private uint m_flockSpawnRandomSeed;
     [SerializeField] private uint m_flockUpdateRandomSeed;
 
@@ -39,8 +38,6 @@ public class FlockMono : MonoBehaviour
     
     public float SeparationRadius => m_separationRadius;
     
-    public float SeekWeight => m_seekWeight;
-
     public float BirdSpeed => m_birdSpeed;
     
     public float BirdAttackRange => m_birdAttackRange;
@@ -72,7 +69,6 @@ public class FlockBaker : Baker<FlockMono>
         {
             mFlockSize = authoring.FlockSize,
             mSeparationRadius = authoring.SeparationRadius,
-            mSeekWeight = authoring.SeekWeight,
             mBirdSpeed = authoring.BirdSpeed,
             mBirdAttackRange = authoring.BirdAttackRange,
             mRocketsPerPatrol = authoring.RocketsFiredPerPatrol,

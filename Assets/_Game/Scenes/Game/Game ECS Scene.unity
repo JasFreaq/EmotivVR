@@ -409,6 +409,99 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f24cc2c7b0e44e44b55daa6883733c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &454638326
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 454638328}
+  - component: {fileID: 454638327}
+  m_Layer: 0
+  m_Name: Flock Spawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &454638327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454638326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8afeb096b6699f84c89fe6d56b7bab09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_flockTransformPrefab: {fileID: 5108772782323403171, guid: 057c1bfb27c62ee46855f2aee13644f9, type: 3}
+  m_flockSpawnVolume:
+    x: 500
+    y: 500
+    z: 500
+  m_flockSizeRange:
+    x: 32
+    y: 64
+  m_minFlockSpawnBounds:
+    x: 8
+    y: 8
+    z: 8
+  m_maxFlockSpawnBounds:
+    x: 12
+    y: 12
+    z: 12
+  m_minFlockSpreadRange:
+    x: 8
+    y: 2
+    z: 7
+  m_maxFlockSpreadRange:
+    x: 10
+    y: 4
+    z: 9
+  m_separationRadiusRange:
+    x: 14
+    y: 18
+  m_flockSpawnerRandomSeed: 201
+  m_birdSpeedRange:
+    x: 15
+    y: 30
+  m_birdAttackRange:
+    x: 50
+    y: 100
+  m_rocketsFiredPerPatrolRange:
+    x: 2
+    y: 4
+  m_rocketsFiredPerSecondRange:
+    x: 1
+    y: 2
+  m_followRadiusRange:
+    x: 75
+    y: 150
+  m_birdsProximityForUpdateRange:
+    x: 15
+    y: 30
+  m_newDestinationInvalidityRadiusRange:
+    x: 50
+    y: 75
+--- !u!4 &454638328
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454638326}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &658512857
 GameObject:
   m_ObjectHideFlags: 0
@@ -466,7 +559,6 @@ MonoBehaviour:
     y: 9
     z: 7
   m_orbitSpawnerRandomSeed: 101
-  m_satellitePrefab: {fileID: 4695566560236114868, guid: fcd273f4e56e675458a5dc4db04e9bf1, type: 3}
   m_satelliteSpeedRange:
     x: 45
     y: 75
@@ -538,7 +630,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32e220ebd02e27244a3ceabcd6daf1e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_laserPrefab: {fileID: 7929725195850624321, guid: 4d00c2e409997c74498a383a0758a07a, type: 3}
+  m_missilePrefab: {fileID: 7929725195850624321, guid: 4d00c2e409997c74498a383a0758a07a, type: 3}
   m_missileType: 0
 --- !u!1 &943504667
 GameObject:
@@ -584,7 +676,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32e220ebd02e27244a3ceabcd6daf1e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_laserPrefab: {fileID: 8051967695340887395, guid: a6739994498910a47999b10767201b19, type: 3}
+  m_missilePrefab: {fileID: 8051967695340887395, guid: a6739994498910a47999b10767201b19, type: 3}
   m_missileType: 0
 --- !u!1 &963327879
 GameObject:
@@ -630,8 +722,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32e220ebd02e27244a3ceabcd6daf1e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_laserPrefab: {fileID: 4012358715608612755, guid: 851bd223c3a5ae04883be4a3caaae147, type: 3}
+  m_missilePrefab: {fileID: 4012358715608612755, guid: 851bd223c3a5ae04883be4a3caaae147, type: 3}
   m_missileType: 1
+--- !u!1 &988119773
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 988119774}
+  - component: {fileID: 988119775}
+  m_Layer: 0
+  m_Name: Bird Cache
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &988119774
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 988119773}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1882427542}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &988119775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 988119773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c535d884c72541d4d997abd316dc5d69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_shipPrefab: {fileID: 1418792802177899192, guid: c301d521666552d49ae47ab44e9dc28f, type: 3}
+  m_shipType: 1
 --- !u!1 &1292304107
 GameObject:
   m_ObjectHideFlags: 0
@@ -676,7 +814,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32e220ebd02e27244a3ceabcd6daf1e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_laserPrefab: {fileID: 8051967695340887395, guid: 8a035b7cd110f4a4f858ccc392d546c8, type: 3}
+  m_missilePrefab: {fileID: 8051967695340887395, guid: 8a035b7cd110f4a4f858ccc392d546c8, type: 3}
   m_missileType: 0
 --- !u!1 &1327922146
 GameObject:
@@ -1509,8 +1647,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32e220ebd02e27244a3ceabcd6daf1e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_laserPrefab: {fileID: 8051967695340887395, guid: b1cee4a875e13214598bbb08654f0844, type: 3}
+  m_missilePrefab: {fileID: 8051967695340887395, guid: b1cee4a875e13214598bbb08654f0844, type: 3}
   m_missileType: 0
+--- !u!1 &1749060871
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1749060872}
+  - component: {fileID: 1749060873}
+  m_Layer: 0
+  m_Name: Satellite Cache (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1749060872
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749060871}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1882427542}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1749060873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749060871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c535d884c72541d4d997abd316dc5d69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_shipPrefab: {fileID: 3698768522024120054, guid: 5363e3f290ef93141a1e0b810797441e, type: 3}
+  m_shipType: 0
 --- !u!1 &1882427541
 GameObject:
   m_ObjectHideFlags: 0
@@ -1546,6 +1730,9 @@ Transform:
   - {fileID: 1657086258}
   - {fileID: 1292304108}
   - {fileID: 963327880}
+  - {fileID: 2053103331}
+  - {fileID: 1749060872}
+  - {fileID: 988119774}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1882427543
@@ -1609,7 +1796,6 @@ MonoBehaviour:
     y: 3
     z: 8
   m_separationRadius: 16
-  m_seekWeight: 1
   m_flockSpawnRandomSeed: 101
   m_flockUpdateRandomSeed: 201
   m_birdSpeed: 20
@@ -1635,6 +1821,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2053103330
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2053103331}
+  - component: {fileID: 2053103332}
+  m_Layer: 0
+  m_Name: Satellite Cache
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2053103331
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053103330}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1882427542}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2053103332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053103330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c535d884c72541d4d997abd316dc5d69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_shipPrefab: {fileID: 4695566560236114868, guid: fcd273f4e56e675458a5dc4db04e9bf1, type: 3}
+  m_shipType: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1648,3 +1880,4 @@ SceneRoots:
   - {fileID: 1882427542}
   - {fileID: 286023557}
   - {fileID: 658512859}
+  - {fileID: 454638328}

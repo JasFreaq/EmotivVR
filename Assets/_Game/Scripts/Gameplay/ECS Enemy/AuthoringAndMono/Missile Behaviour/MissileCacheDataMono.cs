@@ -7,10 +7,10 @@ using UnityEngine;
 
 public class MissileCacheDataMono : MonoBehaviour
 {
-    [SerializeField] private GameObject m_laserPrefab;
+    [SerializeField] private GameObject m_missilePrefab;
     [SerializeField] private MissileType m_missileType;
     
-    public GameObject LaserPrefab => m_laserPrefab;
+    public GameObject MissilePrefab => m_missilePrefab;
 
     public MissileType MissileType => m_missileType;
 }
@@ -23,7 +23,7 @@ public class MissileCacheDataBaker : Baker<MissileCacheDataMono>
 
         AddComponent(missileCacheDataEntity, new MissileCacheData
         {
-            mPrefab = GetEntity(authoring.LaserPrefab, TransformUsageFlags.Dynamic),
+            mPrefab = GetEntity(authoring.MissilePrefab, TransformUsageFlags.Dynamic),
             mMissileType = authoring.MissileType
         });
     }

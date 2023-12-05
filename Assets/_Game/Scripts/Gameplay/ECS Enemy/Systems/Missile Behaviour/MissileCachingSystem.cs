@@ -18,7 +18,7 @@ public partial struct MissileCachingSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
+        Entity enemyElementsCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
         
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         
@@ -28,12 +28,12 @@ public partial struct MissileCachingSystem : ISystem
             switch (missileCacheData.ValueRO.mMissileType)
             {
                 case MissileType.Laser:
-                    DynamicBuffer<MissileLaserElement> laserBuffer = SystemAPI.GetBuffer<MissileLaserElement>(missileCacheEntity);
+                    DynamicBuffer<MissileLaserElement> laserBuffer = SystemAPI.GetBuffer<MissileLaserElement>(enemyElementsCacheEntity);
                     laserBuffer.Add(missileCacheData.ValueRO.mPrefab);
                     break;
 
                 case MissileType.Rocket:
-                    DynamicBuffer<MissileRocketElement> rocketBuffer = SystemAPI.GetBuffer<MissileRocketElement>(missileCacheEntity);
+                    DynamicBuffer<MissileRocketElement> rocketBuffer = SystemAPI.GetBuffer<MissileRocketElement>(enemyElementsCacheEntity);
                     rocketBuffer.Add(missileCacheData.ValueRO.mPrefab);
                     break;
             }

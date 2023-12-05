@@ -15,7 +15,6 @@ public struct OrbitSpawnerData : IComponentData
     public float3 mMinOrbitThicknessBounds;
     public float3 mMaxOrbitThicknessBounds;
     
-    public Entity mSatellitePrefab;
     public float2 mSatelliteSpeedRange;
     public int2 mSatelliteCountRange;
 

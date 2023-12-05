@@ -10,7 +10,7 @@ public readonly partial struct OrbitSpawnerAspect : IAspect
     public readonly Entity mEntity;
     
     private readonly RefRO<OrbitSpawnerData> m_orbitSpawnerData;
-
+    
     private readonly RefRW<EnemySpawnerData> m_enemySpawner;
 
     public Entity OrbitTransformPrefab => m_orbitSpawnerData.ValueRO.mOrbitTransformPrefab;
@@ -21,7 +21,10 @@ public readonly partial struct OrbitSpawnerAspect : IAspect
         set => m_enemySpawner.ValueRW.mSpawnedEntity = value;
     }
 
-    public Entity SatellitePrefab => m_orbitSpawnerData.ValueRO.mSatellitePrefab;
+    public int GetRandomIndex(int length)
+    {
+        return m_enemySpawner.ValueRW.mRandom.NextInt(length);
+    }
 
     public float3 GetRandomSpawnPosition()
     {

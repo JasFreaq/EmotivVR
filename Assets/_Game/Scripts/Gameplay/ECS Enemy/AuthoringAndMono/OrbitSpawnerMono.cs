@@ -19,7 +19,6 @@ public class OrbitSpawnerMono : MonoBehaviour
     [SerializeField] private uint m_orbitSpawnerRandomSeed;
 
     [Header("Satellites")]
-    [SerializeField] private GameObject m_satellitePrefab;
     [SerializeField] private float2 m_satelliteSpeedRange;
     [SerializeField] private int2 m_satelliteCountRange;
 
@@ -47,8 +46,6 @@ public class OrbitSpawnerMono : MonoBehaviour
     
     public uint OrbitSpawnerRandomSeed => m_orbitSpawnerRandomSeed;
     
-    public GameObject SatellitePrefab => m_satellitePrefab;
-    
     public float2 SatelliteSpeedRange => m_satelliteSpeedRange;
     
     public int2 SatelliteCountRange => m_satelliteCountRange;
@@ -74,7 +71,6 @@ public class OrbitSpawnerBaker : Baker<OrbitSpawnerMono>
             mMaxOrbitMemberHalfBounds = authoring.MaxOrbitMemberHalfBounds,
             mMinOrbitThicknessBounds = authoring.MinOrbitThicknessBounds,
             mMaxOrbitThicknessBounds = authoring.MaxOrbitThicknessBounds,
-            mSatellitePrefab = GetEntity(authoring.SatellitePrefab, TransformUsageFlags.Dynamic),
             mSatelliteSpeedRange = authoring.SatelliteSpeedRange,
             mSatelliteCountRange = authoring.SatelliteCountRange,
             mLasersFiredPerSecondRange = authoring.LasersFiredPerSecondRange,

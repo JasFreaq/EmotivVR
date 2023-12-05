@@ -166,7 +166,7 @@ public partial struct FlockFlightJob : IJobEntity
             velocity += cohesion + separation;
 
             float3 seekDirection = math.normalizesafe(targetPosition - transform.Position);
-            velocity += seekDirection * flockProperties.mSeekWeight;
+            velocity += seekDirection;
 
             physicsVelocity.Linear = math.normalizesafe(velocity)
                                              * math.min(math.length(velocity), flockProperties.mBirdSpeed);

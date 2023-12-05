@@ -66,6 +66,10 @@ public class MissileCacheBaker : Baker<EnemyElementsCacheMono>
         AddComponent<MissileRocketElement>(missileCacheEntity);
         
         AddComponent<MissileSpawnElement>(missileCacheEntity);
+        
+        AddComponent<SatellitePrefabElement>(missileCacheEntity);
+        
+        AddComponent<BirdPrefabElement>(missileCacheEntity);
 
         AddComponent(missileCacheEntity, new MissileRandomUtility
         {
