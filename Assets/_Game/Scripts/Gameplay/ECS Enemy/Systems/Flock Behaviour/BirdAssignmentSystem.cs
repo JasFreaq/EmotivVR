@@ -9,8 +9,8 @@ using UnityEngine;
 
 [BurstCompile]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
-[UpdateAfter(typeof(FlockSpawnerSystem))]
-public partial struct FlockAssignmentSystem : ISystem
+[UpdateAfter(typeof(BirdSpawnerSystem))]
+public partial struct BirdAssignmentSystem : ISystem
 {
     [BurstCompile]
     public void OnCreate(ref SystemState state)

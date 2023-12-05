@@ -10,6 +10,7 @@ using UnityEngine;
 
 [BurstCompile]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
+[UpdateAfter(typeof(OrbitSpawnerSystem))]
 public partial struct SatelliteSpawnerSystem : ISystem
 {
     [BurstCompile]
@@ -25,11 +26,12 @@ public partial struct SatelliteSpawnerSystem : ISystem
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         
-        bool allOrbitsSpawned = true;
-        
         foreach ((RefRO<OrbitProperties> orbitProperties, Entity orbitEntity) in 
                  SystemAPI.Query<RefRO<OrbitProperties>>().WithEntityAccess())
         {
+            RefRW<EnemySpawnerData> enemySpawner = SystemAPI.GetComponentRW<EnemySpawnerData>(orbitProperties.ValueRO.mOrbitSpawner);
+            enemySpawner.ValueRW.mSpawnedEntity ??= orbitEntity;
+
             if (state.EntityManager.HasComponent<OrbitSpawnData>(orbitEntity))
             {
                 OrbitSpawnAspect orbitSpawnAspect = SystemAPI.GetAspect<OrbitSpawnAspect>(orbitEntity);
@@ -75,14 +77,9 @@ public partial struct SatelliteSpawnerSystem : ISystem
                 {
                     commandBuffer.RemoveComponent<OrbitSpawnData>(orbitEntity);
                 }
-
-                allOrbitsSpawned = false;
             }
         }
 
         commandBuffer.Playback(state.EntityManager);
-
-        if (allOrbitsSpawned)
-            state.Enabled = false;
     }
 }

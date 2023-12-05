@@ -9,7 +9,7 @@ using UnityEngine;
 
 [BurstCompile]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
-public partial struct FlockSpawnerSystem : ISystem
+public partial struct BirdSpawnerSystem : ISystem
 {
     [BurstCompile]
     public void OnCreate(ref SystemState state)

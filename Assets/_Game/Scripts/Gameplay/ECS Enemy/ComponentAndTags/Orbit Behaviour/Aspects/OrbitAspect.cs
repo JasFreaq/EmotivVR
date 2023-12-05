@@ -14,7 +14,11 @@ public readonly partial struct OrbitAspect : IAspect
     private readonly RefRO<LocalTransform> m_transform;
 
     private readonly RefRO<OrbitProperties> m_orbitProperties;
-    
+
+    private readonly RefRO<OrbitUpdateData> m_orbitUpdateData;
+
+    public int SatelliteCount => m_orbitUpdateData.ValueRO.mOrbitSatelliteCount;
+
     public float3 GetRandomPosition(float3 offset)
     {
         float xPos = m_orbitProperties.ValueRO.mSemiMajorAxis + offset.x;
