@@ -52,18 +52,24 @@ namespace Unity.VRTemplate
 
         public void GazeHoverStart()
         {
-            m_Gazing = true;
-            if (m_StartCo != null)
-                StopCoroutine(m_StartCo);
-            if (m_EndCo != null)
-                StopCoroutine(m_EndCo);
-            m_StartCo = StartCoroutine(StartDelay());
+            if (gameObject.activeInHierarchy) 
+            {
+                m_Gazing = true;
+                if (m_StartCo != null)
+                    StopCoroutine(m_StartCo);
+                if (m_EndCo != null)
+                    StopCoroutine(m_EndCo);
+                m_StartCo = StartCoroutine(StartDelay());
+            }
         }
 
         public void GazeHoverEnd()
         {
-            m_Gazing = false;
-            m_EndCo = StartCoroutine(EndDelay());
+            if (gameObject.activeInHierarchy)
+            {
+                m_Gazing = false;
+                m_EndCo = StartCoroutine(EndDelay());
+            }
         }
 
         IEnumerator StartDelay()

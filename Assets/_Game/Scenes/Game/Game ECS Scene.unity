@@ -181,7 +181,7 @@ GameObject:
   - component: {fileID: 400090904}
   - component: {fileID: 400090901}
   - component: {fileID: 400090900}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player Shield Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -828,7 +828,7 @@ GameObject:
   - component: {fileID: 1327922150}
   - component: {fileID: 1327922148}
   - component: {fileID: 1327922147}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player Sword Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

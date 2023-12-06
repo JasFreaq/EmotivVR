@@ -9,6 +9,8 @@ public class PlayerSwordBaker : Baker<PlayerSwordMono>
 {
     public override void Bake(PlayerSwordMono authoring)
     {
-        GetEntity(TransformUsageFlags.Dynamic);
+        Entity playerSwordEntity = GetEntity(TransformUsageFlags.Dynamic);
+
+        AddComponent<PlayerSwordTransform>(playerSwordEntity);
     }
 }

@@ -17,7 +17,7 @@ public partial struct CollisionEventsSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<EnemyElementsCache>();
-        state.RequireForUpdate<PlayerHealthData>();
+        state.RequireForUpdate<PlayerStateData>();
         state.RequireForUpdate<SimulationSingleton>();
     }
 
@@ -37,7 +37,7 @@ public partial struct CollisionEventsSystem : ISystem
             mShipDamage = enemyElementsCacheAspect.ShipDamage,
             mExplosionLifetime = particlesCacheAspect.TinyExplosionLifetime,
             mExplosionParticles = particlesCacheAspect.TinyExplosion,
-            mPlayerHealthLookup = SystemAPI.GetComponentLookup<PlayerHealthData>(),
+            mPlayerHealthLookup = SystemAPI.GetComponentLookup<PlayerStateData>(),
             mSatelliteLookup = SystemAPI.GetComponentLookup<SatelliteData>(),
             mBirdLookup = SystemAPI.GetComponentLookup<BirdData>(),
             mLaserLookup = SystemAPI.GetComponentLookup<LaserData>(),
@@ -62,7 +62,7 @@ public struct CollisionEventsJob : ICollisionEventsJob
     public Entity mExplosionParticles;
 
     [NativeDisableParallelForRestriction]
-    public ComponentLookup<PlayerHealthData> mPlayerHealthLookup;
+    public ComponentLookup<PlayerStateData> mPlayerHealthLookup;
 
     [NativeDisableParallelForRestriction]
     public ComponentLookup<SatelliteData> mSatelliteLookup;

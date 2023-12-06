@@ -9,6 +9,8 @@ public class PlayerShieldBaker : Baker<PlayerShieldMono>
 {
     public override void Bake(PlayerShieldMono authoring)
     {
-        GetEntity(TransformUsageFlags.Dynamic);
+        Entity playerShieldEntity = GetEntity(TransformUsageFlags.Dynamic);
+
+        AddComponent<PlayerShieldTransform>(playerShieldEntity);
     }
 }

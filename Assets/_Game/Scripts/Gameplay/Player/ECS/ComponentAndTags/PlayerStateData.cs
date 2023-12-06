@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-public struct PlayerHealthData : IComponentData
+public struct PlayerStateData : IComponentData
 {
+    public bool mGamePaused;
+
     public int mPlayerHealth;
 }

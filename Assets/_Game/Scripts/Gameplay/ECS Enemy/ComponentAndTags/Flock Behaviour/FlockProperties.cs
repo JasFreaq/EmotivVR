@@ -6,7 +6,7 @@ using UnityEngine;
 
 public struct FlockProperties : IComponentData
 {
-    public Entity mFlockSpawner;
+    public Entity? mFlockSpawner;
 
     public int mFlockSize;
 

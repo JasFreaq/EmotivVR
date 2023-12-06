@@ -29,8 +29,12 @@ public partial struct SatelliteSpawnerSystem : ISystem
         foreach ((RefRO<OrbitProperties> orbitProperties, Entity orbitEntity) in 
                  SystemAPI.Query<RefRO<OrbitProperties>>().WithEntityAccess())
         {
-            RefRW<EnemySpawnerData> enemySpawner = SystemAPI.GetComponentRW<EnemySpawnerData>(orbitProperties.ValueRO.mOrbitSpawner);
-            enemySpawner.ValueRW.mSpawnedEntity ??= orbitEntity;
+            if (orbitProperties.ValueRO.mOrbitSpawner != null) 
+            {
+                RefRW<EnemySpawnerData> enemySpawner =
+                    SystemAPI.GetComponentRW<EnemySpawnerData>((Entity)orbitProperties.ValueRO.mOrbitSpawner);
+                enemySpawner.ValueRW.mSpawnedEntity ??= orbitEntity;
+            }
 
             if (state.EntityManager.HasComponent<OrbitSpawnData>(orbitEntity))
             {

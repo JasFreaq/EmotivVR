@@ -25,8 +25,12 @@ public partial struct BirdSpawnerSystem : ISystem
         foreach ((RefRO<FlockProperties> flockProperties, Entity flockEntity) in
                  SystemAPI.Query<RefRO<FlockProperties>>().WithEntityAccess())
         {
-            RefRW<EnemySpawnerData> enemySpawner = SystemAPI.GetComponentRW<EnemySpawnerData>(flockProperties.ValueRO.mFlockSpawner);
-            enemySpawner.ValueRW.mSpawnedEntity ??= flockEntity;
+            if (flockProperties.ValueRO.mFlockSpawner != null) 
+            {
+                RefRW<EnemySpawnerData> enemySpawner =
+                    SystemAPI.GetComponentRW<EnemySpawnerData>((Entity)flockProperties.ValueRO.mFlockSpawner);
+                enemySpawner.ValueRW.mSpawnedEntity ??= flockEntity;
+            }
 
             FlockAspect flockAspect = SystemAPI.GetAspect<FlockAspect>(flockEntity);
             FlockSpawnAspect flockSpawnAspect = SystemAPI.GetAspect<FlockSpawnAspect>(flockEntity);

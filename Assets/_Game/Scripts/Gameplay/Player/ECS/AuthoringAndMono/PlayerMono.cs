@@ -20,7 +20,7 @@ public class PlayerBaker : Baker<PlayerMono>
         
         AddComponent<PlayerCameraProperties>(playerEntity);
 
-        AddComponent(playerEntity, new PlayerHealthData
+        AddComponent(playerEntity, new PlayerStateData
         {
             mPlayerHealth = authoring.PlayerStartingHealth
         });

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Windows;
 
 public class PlayerController : MonoBehaviour
@@ -9,9 +10,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float[] m_laserTimes;
     [SerializeField] private EyeLaserHandler m_eyeLaser;
 
+    [SerializeField] private InputActionReference m_pauseInputAction;
+    [SerializeField] private PlayerManager m_playerManager;
+
     private Transform m_cameraTransform;
 
     private Rigidbody m_rigidbody;
+
+    private AudioSource m_flyAudioSource;
 
     private Queue<float> m_inputQueue = new Queue<float>();
 
@@ -30,6 +36,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         m_rigidbody = GetComponent<Rigidbody>();
+        m_flyAudioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -44,6 +51,8 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        //Debug.Log($"Pressed: {m_pauseInputAction.action.WasPressedThisFrame()}");
+
         m_laserTimer += Time.deltaTime * (m_isPlayerLaserInput ? 1f : -1f);
         m_laserTimer = Mathf.Clamp(m_laserTimer, 0f, m_totalLaserTime);
         
@@ -93,10 +102,16 @@ public class PlayerController : MonoBehaviour
             float input = m_inputQueue.Dequeue();
             
             m_rigidbody.velocity = m_cameraTransform.forward * m_playerSpeed * input * Time.deltaTime;
+
+            if (!m_flyAudioSource.isPlaying) 
+                m_flyAudioSource.Play();
         }
         else
         {
             m_rigidbody.velocity = m_cameraTransform.forward * Mathf.Lerp(m_rigidbody.velocity.magnitude, 0f, Time.deltaTime);
+
+            if (m_flyAudioSource.isPlaying)
+                m_flyAudioSource.Stop();
         }
     }
 

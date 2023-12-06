@@ -7,7 +7,7 @@ using Random = Unity.Mathematics.Random;
 
 public struct OrbitProperties : IComponentData
 {
-    public Entity mOrbitSpawner;
+    public Entity? mOrbitSpawner;
 
     public float mSemiMajorAxis;
     public float mSemiMinorAxis;

@@ -102,7 +102,6 @@ public struct TriggerEventsJob : ITriggerEventsJob
             return;
         }
 
-
         HandlePlayerTrigger(otherEntity);
     }
 

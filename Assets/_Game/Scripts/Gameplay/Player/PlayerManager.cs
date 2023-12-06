@@ -25,7 +25,7 @@ public class PlayerManager : MonoBehaviour
     private EntityQuery m_swordQuery;
     private EntityQuery m_shieldQuery;
     
-    private EntityQuery m_healthQuery;
+    private EntityQuery m_stateQuery;
     private EntityQuery m_scoreQuery;
 
     private bool m_addedCameraDetails;
@@ -50,7 +50,7 @@ public class PlayerManager : MonoBehaviour
         m_swordQuery = m_entityManager.CreateEntityQuery(typeof(PlayerSwordTransform));
         m_shieldQuery = m_entityManager.CreateEntityQuery(typeof(PlayerShieldTransform));
         
-        m_healthQuery = m_entityManager.CreateEntityQuery(typeof(PlayerHealthData));
+        m_stateQuery = m_entityManager.CreateEntityQuery(typeof(PlayerStateData));
         m_scoreQuery = m_entityManager.CreateEntityQuery(typeof(ScoreDataElement));
     }
     
@@ -111,10 +111,10 @@ public class PlayerManager : MonoBehaviour
             m_shieldQuery.SetSingleton(playerShieldTransform);
         }
 
-        if (m_healthQuery.TryGetSingleton(out PlayerHealthData playerHealthData))
+        if (m_stateQuery.TryGetSingleton(out PlayerStateData playerStateData))
         {
-            float ratio = (float)playerHealthData.mPlayerHealth / m_playerInitialHealth;
-            m_playerHUD.UpdateHealth(ratio);
+            float healthRatio = (float)playerStateData.mPlayerHealth / m_playerInitialHealth;
+            m_playerHUD.UpdateHealth(healthRatio);
         }
 
         if (m_scoreQuery.TryGetSingletonBuffer(out DynamicBuffer<ScoreDataElement> scoreBuffer))
