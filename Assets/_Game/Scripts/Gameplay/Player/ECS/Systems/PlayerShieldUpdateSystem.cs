@@ -18,6 +18,12 @@ public partial struct PlayerShieldUpdateSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        PlayerStateData playerStateData = SystemAPI.GetSingleton<PlayerStateData>();
+        if (playerStateData.mIsGamePaused)
+        {
+            return;
+        }
+
         Entity shieldEntity = SystemAPI.GetSingletonEntity<PlayerShieldTransform>();
         PlayerShieldAspect shieldAspect = SystemAPI.GetAspect<PlayerShieldAspect>(shieldEntity);
 

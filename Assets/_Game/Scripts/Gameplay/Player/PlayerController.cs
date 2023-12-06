@@ -11,7 +11,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private EyeLaserHandler m_eyeLaser;
 
     [SerializeField] private InputActionReference m_pauseInputAction;
-    [SerializeField] private PlayerManager m_playerManager;
+    
+    private PlayerStateManager m_playerStateManager;
 
     private Transform m_cameraTransform;
 
@@ -27,6 +28,8 @@ public class PlayerController : MonoBehaviour
 
     private bool m_isPlayerLaserInput;
 
+    private bool m_isGamePaused;
+
     public bool IsPlayerLaserInput { set => m_isPlayerLaserInput = value; }
 
     public bool IsLaserActive => m_eyeLaser.gameObject.activeSelf;
@@ -35,6 +38,7 @@ public class PlayerController : MonoBehaviour
     
     private void Awake()
     {
+        m_playerStateManager = GetComponent<PlayerStateManager>();
         m_rigidbody = GetComponent<Rigidbody>();
         m_flyAudioSource = GetComponent<AudioSource>();
     }
@@ -51,7 +55,16 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        //Debug.Log($"Pressed: {m_pauseInputAction.action.WasPressedThisFrame()}");
+        if (m_pauseInputAction.action.WasPressedThisFrame())
+        {
+            m_isGamePaused = !m_isGamePaused;
+            m_playerStateManager.PauseGame(m_isGamePaused);
+        }
+
+        if (m_isPlayerLaserInput)
+        {
+            return;
+        }
 
         m_laserTimer += Time.deltaTime * (m_isPlayerLaserInput ? 1f : -1f);
         m_laserTimer = Mathf.Clamp(m_laserTimer, 0f, m_totalLaserTime);
@@ -97,6 +110,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (m_isGamePaused)
+            return;
+
         if (m_inputQueue.Count > 0)
         {
             float input = m_inputQueue.Dequeue();
@@ -117,6 +133,9 @@ public class PlayerController : MonoBehaviour
 
     public void EnqueueMovementInput(float input)
     {
+        if (m_isGamePaused)
+            return;
+
         m_inputQueue.Enqueue(input);
     }
 }

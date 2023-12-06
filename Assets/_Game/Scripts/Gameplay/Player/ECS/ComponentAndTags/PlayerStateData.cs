@@ -5,7 +5,7 @@ using UnityEngine;
 
 public struct PlayerStateData : IComponentData
 {
-    public bool mGamePaused;
+    public bool mIsGamePaused;
 
     public int mPlayerHealth;
 }

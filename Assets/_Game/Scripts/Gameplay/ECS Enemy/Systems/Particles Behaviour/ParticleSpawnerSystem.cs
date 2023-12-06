@@ -19,6 +19,12 @@ public partial struct ParticleSpawnerSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        PlayerStateData playerStateData = SystemAPI.GetSingleton<PlayerStateData>();
+        if (playerStateData.mIsGamePaused)
+        {
+            return;
+        }
+
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
         DynamicBuffer<ParticleSpawnElement> buffer = SystemAPI.GetSingletonBuffer<ParticleSpawnElement>();

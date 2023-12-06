@@ -21,6 +21,12 @@ public partial struct OrbitSpawnerSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        PlayerStateData playerStateData = SystemAPI.GetSingleton<PlayerStateData>();
+        if (playerStateData.mIsGamePaused)
+        {
+            return;
+        }
+
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         
         foreach ((RefRO<OrbitSpawnerData> orbitSpawnerData, Entity orbitSpawnerEntity) in

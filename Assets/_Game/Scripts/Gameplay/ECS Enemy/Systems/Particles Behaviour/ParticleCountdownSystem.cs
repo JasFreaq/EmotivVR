@@ -21,6 +21,12 @@ public partial struct ParticleCountdownSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        PlayerStateData playerStateData = SystemAPI.GetSingleton<PlayerStateData>();
+        if (playerStateData.mIsGamePaused)
+        {
+            return;
+        }
+
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         ParticleCountdownJob particleCountdownJob = new ParticleCountdownJob

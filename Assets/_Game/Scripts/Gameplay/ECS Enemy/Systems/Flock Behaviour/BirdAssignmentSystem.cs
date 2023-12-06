@@ -23,8 +23,14 @@ public partial struct BirdAssignmentSystem : ISystem
     {
         foreach ((RefRW<BirdData> birdData, Entity birdEntity) in SystemAPI.Query<RefRW<BirdData>>().WithEntityAccess())
         {
-            DynamicBuffer<FlockBirdElement> flockMembers = SystemAPI.GetBuffer<FlockBirdElement>(birdData.ValueRO.mOwningFlock);
-            flockMembers.Add(birdEntity);
+            if (!birdData.ValueRO.mAssignedToFlock) 
+            {
+                DynamicBuffer<FlockBirdElement> flockMembers =
+                    SystemAPI.GetBuffer<FlockBirdElement>(birdData.ValueRO.mOwningFlock);
+                flockMembers.Add(birdEntity);
+
+                birdData.ValueRW.mAssignedToFlock = true;
+            }
         }
 
         state.Enabled = false;

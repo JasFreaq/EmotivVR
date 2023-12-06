@@ -18,6 +18,12 @@ public partial struct PlayerSwordUpdateSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        PlayerStateData playerStateData = SystemAPI.GetSingleton<PlayerStateData>();
+        if (playerStateData.mIsGamePaused)
+        {
+            return;
+        }
+
         Entity swordEntity = SystemAPI.GetSingletonEntity<PlayerSwordTransform>();
         PlayerSwordAspect swordAspect = SystemAPI.GetAspect<PlayerSwordAspect>(swordEntity);
 

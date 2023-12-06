@@ -24,13 +24,16 @@ public partial struct SatelliteOrbitingSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        PlayerStateData playerStateData = SystemAPI.GetSingleton<PlayerStateData>();
+        if (playerStateData.mIsGamePaused)
+        {
+            return;
+        }
+
         foreach (RefRW<OrbitUpdateData> orbitUpdateData in SystemAPI.Query<RefRW<OrbitUpdateData>>())
         {
             orbitUpdateData.ValueRW.mFireTimer += SystemAPI.Time.DeltaTime;
         }
-
-        Entity missileCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
-        EnemyElementsCacheAspect enemyElementsCacheAspect = SystemAPI.GetAspect<EnemyElementsCacheAspect>(missileCacheEntity);
 
         Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerCameraTransform>();
         PlayerAspect playerAspect = SystemAPI.GetAspect<PlayerAspect>(playerEntity);

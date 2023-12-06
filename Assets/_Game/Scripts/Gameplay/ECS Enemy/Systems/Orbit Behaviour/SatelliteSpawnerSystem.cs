@@ -22,6 +22,12 @@ public partial struct SatelliteSpawnerSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        PlayerStateData playerStateData = SystemAPI.GetSingleton<PlayerStateData>();
+        if (playerStateData.mIsGamePaused)
+        {
+            return;
+        }
+
         float deltaTime = SystemAPI.Time.DeltaTime;
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);

@@ -20,6 +20,12 @@ public partial struct BirdSpawnerSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        PlayerStateData playerStateData = SystemAPI.GetSingleton<PlayerStateData>();
+        if (playerStateData.mIsGamePaused)
+        {
+            return;
+        }
+
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
         foreach ((RefRO<FlockProperties> flockProperties, Entity flockEntity) in
@@ -32,33 +38,34 @@ public partial struct BirdSpawnerSystem : ISystem
                 enemySpawner.ValueRW.mSpawnedEntity ??= flockEntity;
             }
 
-            FlockAspect flockAspect = SystemAPI.GetAspect<FlockAspect>(flockEntity);
-            FlockSpawnAspect flockSpawnAspect = SystemAPI.GetAspect<FlockSpawnAspect>(flockEntity);
-            
-            for (int i = 0, l = flockAspect.FlockSize; i < l; i++)
+            if (state.EntityManager.HasComponent<FlockSpawnData>(flockEntity)) 
             {
-                Entity birdEntity = commandBuffer.Instantiate(flockSpawnAspect.BirdPrefab);
+                FlockAspect flockAspect = SystemAPI.GetAspect<FlockAspect>(flockEntity);
+                FlockSpawnAspect flockSpawnAspect = SystemAPI.GetAspect<FlockSpawnAspect>(flockEntity);
 
-                LocalTransform spawnTransform = new LocalTransform
+                for (int i = 0, l = flockAspect.FlockSize; i < l; i++)
                 {
-                    Position = flockAspect.Transform.Position + flockSpawnAspect.GetRandomOffset(),
-                    Rotation = quaternion.identity,
-                    Scale = 1f
-                };
-                commandBuffer.SetComponent(birdEntity, spawnTransform);
+                    Entity birdEntity = commandBuffer.Instantiate(flockSpawnAspect.BirdPrefab);
 
-                BirdData birdData = new BirdData
-                {
-                    mOwningFlock = flockEntity
-                };
-                commandBuffer.AddComponent(birdEntity, birdData);
+                    LocalTransform spawnTransform = new LocalTransform
+                    {
+                        Position = flockAspect.Transform.Position + flockSpawnAspect.GetRandomOffset(),
+                        Rotation = quaternion.identity,
+                        Scale = 1f
+                    };
+                    commandBuffer.SetComponent(birdEntity, spawnTransform);
+
+                    BirdData birdData = new BirdData
+                    {
+                        mOwningFlock = flockEntity
+                    };
+                    commandBuffer.AddComponent(birdEntity, birdData);
+                }
+
+                commandBuffer.RemoveComponent<FlockSpawnData>(flockEntity);
             }
-            
-            commandBuffer.RemoveComponent<FlockSpawnData>(flockEntity);
         }
 
         commandBuffer.Playback(state.EntityManager);
-
-        state.Enabled = false;
     }
 }

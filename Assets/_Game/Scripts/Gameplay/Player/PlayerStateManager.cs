@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviour
+public class PlayerStateManager : MonoBehaviour
 {
     [SerializeField] private Transform m_eyeLaserTransform;
     [SerializeField] private Transform m_swordTransform;
@@ -11,6 +11,7 @@ public class PlayerManager : MonoBehaviour
 
     [SerializeField] private int m_playerInitialHealth = 200;
     [SerializeField] private PlayerHUDHandler m_playerHUD;
+    [SerializeField] private GameObject m_pauseMenu;
 
     private Transform m_mainCameraTransform;
 
@@ -32,6 +33,8 @@ public class PlayerManager : MonoBehaviour
 
     private int m_totalScore;
 
+    private bool m_isGamePaused;
+    
     private void Awake()
     {
         m_playerController = GetComponent<PlayerController>();
@@ -113,6 +116,9 @@ public class PlayerManager : MonoBehaviour
 
         if (m_stateQuery.TryGetSingleton(out PlayerStateData playerStateData))
         {
+            playerStateData.mIsGamePaused = m_isGamePaused;
+            m_stateQuery.SetSingleton(playerStateData);
+
             float healthRatio = (float)playerStateData.mPlayerHealth / m_playerInitialHealth;
             m_playerHUD.UpdateHealth(healthRatio);
         }
@@ -127,5 +133,11 @@ public class PlayerManager : MonoBehaviour
             m_playerHUD.UpdateScore(m_totalScore);
             scoreBuffer.Clear();
         }
+    }
+
+    public void PauseGame(bool pause)
+    {
+        m_isGamePaused = pause;
+        m_pauseMenu.SetActive(m_isGamePaused);
     }
 }

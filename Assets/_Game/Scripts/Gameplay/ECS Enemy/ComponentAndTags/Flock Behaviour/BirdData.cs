@@ -8,6 +8,8 @@ using UnityEngine;
 public struct BirdData : IComponentData
 {
     public Entity mOwningFlock;
-    
+
+    public bool mAssignedToFlock;
+
     public bool mMarkedToDestroy;
 }

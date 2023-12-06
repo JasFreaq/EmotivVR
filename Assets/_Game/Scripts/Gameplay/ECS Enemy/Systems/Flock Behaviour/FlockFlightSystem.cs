@@ -25,9 +25,14 @@ public partial struct FlockFlightSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        foreach (RefRW<FlockUpdateData> flockUpdateData in SystemAPI.Query<RefRW<FlockUpdateData>>())
+        PlayerStateData playerStateData = SystemAPI.GetSingleton<PlayerStateData>();
+
+        if (!playerStateData.mIsGamePaused) 
         {
-            flockUpdateData.ValueRW.mFireTimer += SystemAPI.Time.DeltaTime;
+            foreach (RefRW<FlockUpdateData> flockUpdateData in SystemAPI.Query<RefRW<FlockUpdateData>>())
+            {
+                flockUpdateData.ValueRW.mFireTimer += SystemAPI.Time.DeltaTime;
+            }
         }
 
         Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerCameraTransform>();
@@ -37,6 +42,7 @@ public partial struct FlockFlightSystem : ISystem
 
         FlockFlightJob job = new FlockFlightJob
         {
+            mIsGamePaused = playerStateData.mIsGamePaused,
             mDeltaTime = SystemAPI.Time.DeltaTime,
             mTime = (float)SystemAPI.Time.ElapsedTime,
             mPlayerPosition = playerAspect.Transform.Position,
@@ -62,6 +68,8 @@ public partial struct FlockFlightSystem : ISystem
 [BurstCompile]
 public partial struct FlockFlightJob : IJobEntity
 {
+    public bool mIsGamePaused;
+    
     public float mDeltaTime;
 
     public float mTime;
@@ -96,6 +104,12 @@ public partial struct FlockFlightJob : IJobEntity
     [BurstCompile]
     public void Execute(ref LocalTransform transform, [ChunkIndexInQuery] int sortKey, in Entity entity, in BirdData birdData, ref PhysicsVelocity physicsVelocity)
     {
+        if (mIsGamePaused)
+        {
+            physicsVelocity.Linear = float3.zero;
+            return;
+        }
+
         if (birdData.mMarkedToDestroy)
         {
             if (mBirdLookup.HasBuffer(birdData.mOwningFlock))
