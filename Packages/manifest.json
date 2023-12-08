@@ -2,7 +2,7 @@
   "dependencies": {
     "com.havok.physics": "1.0.16",
     "com.unity.2d.sprite": "1.0.0",
-    "com.unity.cinemachine": "2.9.5",
+    "com.unity.cinemachine": "2.9.7",
     "com.unity.collab-proxy": "2.2.0",
     "com.unity.entities.graphics": "1.0.16",
     "com.unity.ext.nunit": "1.0.6",

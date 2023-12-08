@@ -611,7 +611,7 @@ namespace EmotivUnityPlugin
         {
             string dataText = "sys data: " + data.Detection + ", event: " + data.EventMessage + ", time " + data.Time.ToString();
             // print out data to console
-            //UnityEngine.Debug.Log(dataText);
+            UnityEngine.Debug.Log(dataText);
             // show the system event to message log
             _messageLog = dataText;
 
@@ -622,7 +622,7 @@ namespace EmotivUnityPlugin
         {
             string dataText = "com data: " + data.Act + ", power: " + data.Pow.ToString() + ", time " + data.Time.ToString();
             // print out data to console
-            //UnityEngine.Debug.Log(dataText);
+            UnityEngine.Debug.Log(dataText);
             
             MentalCommandReceived(data);
         }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class BackgroundMusicHandler : MonoBehaviour
 {
     [SerializeField] private AudioClip[] m_bgmAudioClips;
+    [SerializeField] private bool m_isSingleton;
 
     AudioSource m_audioSource;
 
@@ -12,6 +13,29 @@ public class BackgroundMusicHandler : MonoBehaviour
 
     private void Awake()
     {
+        BackgroundMusicHandler[] bgmHandlers =
+            FindObjectsByType<BackgroundMusicHandler>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        
+        if (m_isSingleton) 
+        {
+            if (bgmHandlers.Length > 1)
+            {
+                Destroy(gameObject);
+            }
+
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            foreach (BackgroundMusicHandler bgmHandler in bgmHandlers)
+            {
+                if (gameObject != bgmHandler.gameObject)
+                {
+                    Destroy(bgmHandler.gameObject);
+                }
+            }
+        }
+
         m_audioSource = GetComponent<AudioSource>();
     }
 

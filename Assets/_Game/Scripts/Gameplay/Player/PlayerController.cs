@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private EyeLaserHandler m_eyeLaser;
 
     [SerializeField] private InputActionReference m_pauseInputAction;
+    [SerializeField] private bool m_isPlayMode;
     
     private PlayerStateManager m_playerStateManager;
 
@@ -28,17 +29,23 @@ public class PlayerController : MonoBehaviour
 
     private bool m_isPlayerLaserInput;
 
+    private bool m_isProfileLoaded;
+    
     private bool m_isGamePaused;
-
+    
     public bool IsPlayerLaserInput { set => m_isPlayerLaserInput = value; }
 
     public bool IsLaserActive => m_eyeLaser.gameObject.activeSelf;
     
     public float LaserRange => m_eyeLaser.LaserRange;
-    
+
     private void Awake()
     {
         m_playerStateManager = GetComponent<PlayerStateManager>();
+
+        if (m_isPlayMode)
+            m_playerStateManager.PauseGame(true, false);
+
         m_rigidbody = GetComponent<Rigidbody>();
         m_flyAudioSource = GetComponent<AudioSource>();
     }
@@ -55,13 +62,18 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (m_pauseInputAction.action.WasPressedThisFrame())
+        if (!m_isProfileLoaded)
+            return;
+
+        if (m_pauseInputAction != null) 
         {
-            m_isGamePaused = !m_isGamePaused;
-            m_playerStateManager.PauseGame(m_isGamePaused);
+            if (m_pauseInputAction.action.WasPressedThisFrame())
+            {
+                PauseGame();
+            }
         }
 
-        if (m_isPlayerLaserInput)
+        if (m_isGamePaused)
         {
             return;
         }
@@ -137,5 +149,17 @@ public class PlayerController : MonoBehaviour
             return;
 
         m_inputQueue.Enqueue(input);
+    }
+
+    public void HandleProfileLoad()
+    {
+        m_isProfileLoaded = true;
+        m_playerStateManager.PauseGame(false, false);
+    }
+
+    public void PauseGame()
+    {
+        m_isGamePaused = !m_isGamePaused;
+        m_playerStateManager.PauseGame(m_isGamePaused);
     }
 }

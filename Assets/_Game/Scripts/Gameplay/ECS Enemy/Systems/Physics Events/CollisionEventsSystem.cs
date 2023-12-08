@@ -43,7 +43,7 @@ public partial struct CollisionEventsSystem : ISystem
             mShipDamage = enemyElementsCacheAspect.ShipDamage,
             mExplosionLifetime = particlesCacheAspect.TinyExplosionLifetime,
             mExplosionParticles = particlesCacheAspect.TinyExplosion,
-            mPlayerHealthLookup = SystemAPI.GetComponentLookup<PlayerStateData>(),
+            mPlayerStateLookup = SystemAPI.GetComponentLookup<PlayerStateData>(),
             mSatelliteLookup = SystemAPI.GetComponentLookup<SatelliteData>(),
             mBirdLookup = SystemAPI.GetComponentLookup<BirdData>(),
             mLaserLookup = SystemAPI.GetComponentLookup<LaserData>(),
@@ -51,6 +51,7 @@ public partial struct CollisionEventsSystem : ISystem
         };
 
         state.Dependency = collisionJob.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
+        state.Dependency.Complete();
     }
 }
 
@@ -68,7 +69,7 @@ public struct CollisionEventsJob : ICollisionEventsJob
     public Entity mExplosionParticles;
 
     [NativeDisableParallelForRestriction]
-    public ComponentLookup<PlayerStateData> mPlayerHealthLookup;
+    public ComponentLookup<PlayerStateData> mPlayerStateLookup;
 
     [NativeDisableParallelForRestriction]
     public ComponentLookup<SatelliteData> mSatelliteLookup;
@@ -88,7 +89,7 @@ public struct CollisionEventsJob : ICollisionEventsJob
         Entity playerEntity;
         Entity otherEntity;
 
-        if (mPlayerHealthLookup.HasComponent(collisionEvent.EntityA))
+        if (mPlayerStateLookup.HasComponent(collisionEvent.EntityA))
         {
             playerEntity = collisionEvent.EntityA;
             otherEntity = collisionEvent.EntityB;
@@ -126,6 +127,6 @@ public struct CollisionEventsJob : ICollisionEventsJob
             mRocketLookup.GetRefRW(otherEntity).ValueRW.mMarkedToDestroy = true;
         }
 
-        mPlayerHealthLookup.GetRefRW(playerEntity).ValueRW.mPlayerHealth -= damage;
+        mPlayerStateLookup.GetRefRW(playerEntity).ValueRW.mPlayerHealth -= damage;
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Entities;
 using UnityEngine;
 
@@ -12,6 +13,8 @@ public class PlayerStateManager : MonoBehaviour
     [SerializeField] private int m_playerInitialHealth = 200;
     [SerializeField] private PlayerHUDHandler m_playerHUD;
     [SerializeField] private GameObject m_pauseMenu;
+    [SerializeField] private GameObject m_gameOverMenu;
+    [SerializeField] private TextMeshProUGUI m_gameOverScore;
 
     private Transform m_mainCameraTransform;
 
@@ -97,21 +100,27 @@ public class PlayerStateManager : MonoBehaviour
 
             m_eyeLaserQuery.SetSingleton(playerEyeLaserData);
         }
-        
-        if (m_swordQuery.TryGetSingleton(out PlayerSwordTransform playerSwordTransform))
-        {
-            playerSwordTransform.mPlayerSwordPosition = m_swordTransform.position;
-            playerSwordTransform.mPlayerSwordRotation = m_swordTransform.rotation;
 
-            m_swordQuery.SetSingleton(playerSwordTransform);
+        if (m_swordTransform) 
+        {
+            if (m_swordQuery.TryGetSingleton(out PlayerSwordTransform playerSwordTransform))
+            {
+                playerSwordTransform.mPlayerSwordPosition = m_swordTransform.position;
+                playerSwordTransform.mPlayerSwordRotation = m_swordTransform.rotation;
+
+                m_swordQuery.SetSingleton(playerSwordTransform);
+            }
         }
-        
-        if (m_shieldQuery.TryGetSingleton(out PlayerShieldTransform playerShieldTransform))
-        {
-            playerShieldTransform.mPlayerShieldPosition = m_shieldTransform.position;
-            playerShieldTransform.mPlayerShieldRotation = m_shieldTransform.rotation;
 
-            m_shieldQuery.SetSingleton(playerShieldTransform);
+        if (m_shieldTransform) 
+        {
+            if (m_shieldQuery.TryGetSingleton(out PlayerShieldTransform playerShieldTransform))
+            {
+                playerShieldTransform.mPlayerShieldPosition = m_shieldTransform.position;
+                playerShieldTransform.mPlayerShieldRotation = m_shieldTransform.rotation;
+
+                m_shieldQuery.SetSingleton(playerShieldTransform);
+            }
         }
 
         if (m_stateQuery.TryGetSingleton(out PlayerStateData playerStateData))
@@ -119,8 +128,14 @@ public class PlayerStateManager : MonoBehaviour
             playerStateData.mIsGamePaused = m_isGamePaused;
             m_stateQuery.SetSingleton(playerStateData);
 
-            float healthRatio = (float)playerStateData.mPlayerHealth / m_playerInitialHealth;
+            int playerHealth = playerStateData.mPlayerHealth;
+            float healthRatio = (float)playerHealth / m_playerInitialHealth;
             m_playerHUD.UpdateHealth(healthRatio);
+
+            if (playerHealth <= 0)
+            {
+
+            }
         }
 
         if (m_scoreQuery.TryGetSingletonBuffer(out DynamicBuffer<ScoreDataElement> scoreBuffer))
@@ -135,9 +150,19 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
 
-    public void PauseGame(bool pause)
+    public void PauseGame(bool pause, bool alterMenu = true)
     {
         m_isGamePaused = pause;
-        m_pauseMenu.SetActive(m_isGamePaused);
+
+        if (alterMenu)
+            m_pauseMenu.SetActive(m_isGamePaused);
+    }
+    
+    public void GameOver()
+    {
+        m_isGamePaused = true;
+
+        m_gameOverScore.text = m_totalScore.ToString();
+        m_gameOverMenu.SetActive(true);
     }
 }

@@ -15,14 +15,12 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     
     private EmotivUnityItf m_emotivInterface = EmotivUnityItf.Instance;
 
-    private PlayerInputWrapper m_playerInputWrapper;
+    private PlayerControlWrapper m_playerControlWrapper;
 
     private const float k_TimeUpdateData = 1f;
 
     private const bool k_IsDataBufferUsing = false; // default subscribed data will not saved to Data buffer
-
-    private const string k_ProfileName = "LaserKnight"; // default profile name for playtesting
-
+    
     private Queue<SystemEvent> m_sysEventQueue = new Queue<SystemEvent>();
 
     private Queue<JObject> m_signatureActionsQueue = new Queue<JObject>();
@@ -32,16 +30,14 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     private Dictionary<string, int> m_signatureActionsDict = new Dictionary<string, int>();
 
     private float m_timerDataUpdate;
-
-    private bool m_isAuthorized;
-
+    
     private bool m_isSessionCreated;
     
     private bool m_isProfileLoaded;
     
     private void Awake()
     {
-        m_playerInputWrapper = GetComponent<PlayerInputWrapper>();
+        m_playerControlWrapper = GetComponent<PlayerControlWrapper>();
     }
 
     private void Start()
@@ -98,22 +94,10 @@ public class EmotivTrainingInterfacer : MonoBehaviour
         if (m_timerDataUpdate - k_TimeUpdateData >= Mathf.Epsilon)
         {
             m_timerDataUpdate -= k_TimeUpdateData;
-
-            if (!m_emotivInterface.IsSessionCreated)
-            {
-                m_emotivInterface.CreateSessionWithHeadset("");
-            }
-
-            if (!m_isAuthorized && m_emotivInterface.IsAuthorizedOK)
-            {
-                m_trainingUI.EnableLoadProfileButton();
-
-                m_isAuthorized = true;
-            }
-
+            
             if (!m_isSessionCreated && m_emotivInterface.IsSessionCreated)
             {
-                m_emotivInterface.SubscribeData(new List<string> { "sys", "com" });
+                m_emotivInterface.SubscribeData(new List<string> { "sys", "com"});
                 m_emotivInterface.SysEventsReceived += OnSysEventsReceived;
                 m_emotivInterface.MentalCommandReceived += OnMentalCommandReceived;
 
@@ -121,15 +105,18 @@ public class EmotivTrainingInterfacer : MonoBehaviour
                 m_emotivInterface.BciTraining.MentalCommandBrainMapOK += OnMentalCommandBrainMap;
                 m_emotivInterface.BciTraining.MentalCommandTrainingThresholdOK += OnTrainingThresholdReceived;
 
+                m_trainingUI.EnableLoadProfileButton();
+
                 m_isSessionCreated = true;
             }
 
             if (!m_isProfileLoaded && m_emotivInterface.IsProfileLoaded)
             {
                 m_trainingUI.HandleProfileLoaded();
+                m_playerControlWrapper.HandleProfileLoaded();
 
-                m_emotivInterface.GetMCTrainedSignatureActions(k_ProfileName);
-                m_emotivInterface.GetMCBrainMap(k_ProfileName);
+                m_emotivInterface.GetMCTrainedSignatureActions(EmotivGameplayInterfacer.ProfileName);
+                m_emotivInterface.GetMCBrainMap(EmotivGameplayInterfacer.ProfileName);
 
                 m_isProfileLoaded = true;
             }
@@ -143,7 +130,7 @@ public class EmotivTrainingInterfacer : MonoBehaviour
         m_trainingUI.UnsubscribeEventsFromAllButtons();
     }
 
-    void OnApplicationQuit()
+    private void OnDestroy()
     {
         m_emotivInterface.Stop();
     }
@@ -171,10 +158,14 @@ public class EmotivTrainingInterfacer : MonoBehaviour
         }
     }
 
-
+    public void CreateSession()
+    {
+        m_emotivInterface.CreateSessionWithHeadset("");
+    }
+    
     public void LoadProfile()
     {
-        m_emotivInterface.LoadProfile(k_ProfileName);
+        m_emotivInterface.LoadProfile(EmotivGameplayInterfacer.ProfileName);
     }
     
     private void OnSysEventsReceived(SysEventArgs data)
@@ -193,16 +184,20 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     {
         if (m_trainingUI.IsTraining)
         {
-            if (data.Act != m_trainingUI.CurrentSelectedAction)
-                return;
-        }
+            if (data.Act == m_trainingUI.CurrentSelectedAction)
+            {
+                if (data.Act == "pull")
+                {
+                    m_playerControlWrapper.EnqueuePlayerMovementInput((float)data.Pow);
+                }
 
-        if (data.Act == "pull")
-        {
-            m_playerInputWrapper.EnqueuePlayerMovementInput((float)data.Pow);
+                m_playerControlWrapper.IsPlayerLaserInput = data.Act == "push";
+            }
         }
-        
-        m_playerInputWrapper.IsPlayerLaserInput = data.Act == "push";
+        else
+        {
+            m_playerControlWrapper.IsPlayerLaserInput = false;
+        }
     }
 
     private void ProcessSystemEvent(SystemEvent sysEvent)
@@ -215,16 +210,16 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
             case SystemEvent.MC_Succeeded:
                 m_trainingUI.SetTrainedState();
-                m_emotivInterface.GetMCTrainingThreshold(k_ProfileName);
+                m_emotivInterface.GetMCTrainingThreshold(EmotivGameplayInterfacer.ProfileName);
                 break;
 
             case SystemEvent.MC_DataErased:
                 m_signatureActionsDict[m_trainingUI.CurrentSelectedAction] = 0;
 
-                m_emotivInterface.GetMCTrainedSignatureActions(k_ProfileName);
-                m_emotivInterface.GetMCBrainMap(k_ProfileName);
+                m_emotivInterface.GetMCTrainedSignatureActions(EmotivGameplayInterfacer.ProfileName);
+                m_emotivInterface.GetMCBrainMap(EmotivGameplayInterfacer.ProfileName);
 
-                m_emotivInterface.SaveProfile(k_ProfileName);
+                m_emotivInterface.SaveProfile(EmotivGameplayInterfacer.ProfileName);
                 break;
 
             case SystemEvent.MC_Reset:
@@ -234,14 +229,20 @@ public class EmotivTrainingInterfacer : MonoBehaviour
             case SystemEvent.MC_Completed:
                 m_trainingUI.SetBaseState();
 
-                m_emotivInterface.GetMCTrainedSignatureActions(k_ProfileName);
-                m_emotivInterface.GetMCBrainMap(k_ProfileName);
+                m_emotivInterface.GetMCTrainedSignatureActions(EmotivGameplayInterfacer.ProfileName);
+                m_emotivInterface.GetMCBrainMap(EmotivGameplayInterfacer.ProfileName);
 
-                m_emotivInterface.SaveProfile(k_ProfileName);
+                m_emotivInterface.SaveProfile(EmotivGameplayInterfacer.ProfileName);
+
+                if (m_trainingUI.CurrentSelectedAction == "pull") 
+                    m_playerControlWrapper.ResetPlayerPosition();
                 break;
 
             case SystemEvent.MC_Rejected:
                 m_trainingUI.SetBaseState();
+
+                if (m_trainingUI.CurrentSelectedAction == "pull")
+                    m_playerControlWrapper.ResetPlayerPosition();
                 break;
         }
     }

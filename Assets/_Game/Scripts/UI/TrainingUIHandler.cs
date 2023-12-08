@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using DG.Tweening;
+using dirox.emotiv.controller;
+using UnityEngine.SceneManagement;
 using static Cinemachine.DocumentationSortingAttribute;
 
 public class TrainingUIHandler : MonoBehaviour
@@ -33,7 +35,7 @@ public class TrainingUIHandler : MonoBehaviour
     }
 
     private const float k_trainingDuration = 8f;
-
+    
     [SerializeField] private float m_brainMapRadius = 200f;
     [SerializeField] private float m_thresholdIndicatorHalfRange = 70f;
     [SerializeField] private ActionUIElement[] m_actionUIElements;
