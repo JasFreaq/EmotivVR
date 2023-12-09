@@ -11,7 +11,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private EyeLaserHandler m_eyeLaser;
 
     [SerializeField] private InputActionReference m_pauseInputAction;
+    [SerializeField] private InputActionReference m_movementInputAction;
+    [SerializeField] private InputActionReference m_laserInputAction;
     [SerializeField] private bool m_isPlayMode;
+    [SerializeField] private bool m_overrideControls;
     
     private PlayerStateManager m_playerStateManager;
 
@@ -33,7 +36,18 @@ public class PlayerController : MonoBehaviour
     
     private bool m_isGamePaused;
     
-    public bool IsPlayerLaserInput { set => m_isPlayerLaserInput = value; }
+    private bool m_isMovementInput;
+    
+    private bool m_isLaserInput;
+
+    public bool IsPlayerLaserInput
+    {
+        set
+        {
+            if (!m_overrideControls)
+                m_isPlayerLaserInput = value;
+        }
+    }
 
     public bool IsLaserActive => m_eyeLaser.gameObject.activeSelf;
     
@@ -77,6 +91,8 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
+
+        SimulateInput();
 
         m_laserTimer += Time.deltaTime * (m_isPlayerLaserInput ? 1f : -1f);
         m_laserTimer = Mathf.Clamp(m_laserTimer, 0f, m_totalLaserTime);
@@ -161,5 +177,24 @@ public class PlayerController : MonoBehaviour
     {
         m_isGamePaused = !m_isGamePaused;
         m_playerStateManager.PauseGame(m_isGamePaused);
+    }
+
+    private void SimulateInput()
+    {
+        if (m_movementInputAction.action.WasPressedThisFrame())
+        {
+            m_isMovementInput = !m_movementInputAction;
+        }
+        Debug.Log(m_isMovementInput);
+        if (m_laserInputAction.action.WasPressedThisFrame())
+        {
+            m_isLaserInput = !m_isLaserInput;
+            m_isPlayerLaserInput = m_isLaserInput;
+        }
+
+        if (m_isMovementInput)
+        {
+            EnqueueMovementInput(Random.Range(0f, 1f));
+        }
     }
 }

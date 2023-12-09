@@ -9,6 +9,8 @@ using Unity.Entities.UniversalDelegates;
 
 public class EmotivTrainingInterfacer : MonoBehaviour
 {
+    public const float k_TrainingDuration = 8f;
+
     [SerializeField] private ApplicationConfiguration m_appConfig;
 
     [SerializeField] private TrainingUIHandler m_trainingUI;
@@ -17,9 +19,9 @@ public class EmotivTrainingInterfacer : MonoBehaviour
 
     private PlayerControlWrapper m_playerControlWrapper;
 
-    private const float k_TimeUpdateData = 1f;
+    private const float k_timeUpdateData = 1f;
 
-    private const bool k_IsDataBufferUsing = false; // default subscribed data will not saved to Data buffer
+    private const bool k_isDataBufferUsing = false; // default subscribed data will not saved to Data buffer
     
     private Queue<SystemEvent> m_sysEventQueue = new Queue<SystemEvent>();
 
@@ -43,7 +45,7 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     private void Start()
     {
         m_emotivInterface.Init(m_appConfig.ClientId, m_appConfig.ClientSecret, m_appConfig.AppName, m_appConfig.AppVersion,
-            k_IsDataBufferUsing);
+            k_isDataBufferUsing);
         
         m_emotivInterface.Start();
     }
@@ -91,9 +93,9 @@ public class EmotivTrainingInterfacer : MonoBehaviour
     {
         m_timerDataUpdate += Time.deltaTime;
         
-        if (m_timerDataUpdate - k_TimeUpdateData >= Mathf.Epsilon)
+        if (m_timerDataUpdate - k_timeUpdateData >= Mathf.Epsilon)
         {
-            m_timerDataUpdate -= k_TimeUpdateData;
+            m_timerDataUpdate -= k_timeUpdateData;
             
             if (!m_isSessionCreated && m_emotivInterface.IsSessionCreated)
             {
@@ -110,15 +112,18 @@ public class EmotivTrainingInterfacer : MonoBehaviour
                 m_isSessionCreated = true;
             }
 
-            if (!m_isProfileLoaded && m_emotivInterface.IsProfileLoaded)
+            if (m_emotivInterface.IsProfileLoaded)
             {
-                m_trainingUI.HandleProfileLoaded();
-                m_playerControlWrapper.HandleProfileLoaded();
+                if (!m_isProfileLoaded) 
+                {
+                    m_trainingUI.HandleProfileLoaded();
+                    m_playerControlWrapper.HandleProfileLoaded();
+
+                    m_isProfileLoaded = true;
+                }
 
                 m_emotivInterface.GetMCTrainedSignatureActions(EmotivGameplayInterfacer.ProfileName);
                 m_emotivInterface.GetMCBrainMap(EmotivGameplayInterfacer.ProfileName);
-
-                m_isProfileLoaded = true;
             }
         }
 

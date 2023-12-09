@@ -17,9 +17,9 @@ public class EmotivGameplayInterfacer : MonoBehaviour
 
     private PlayerControlWrapper m_playerControlWrapper;
 
-    private const float k_TimeUpdateData = 1f;
+    private const float k_timeUpdateData = 1f;
 
-    private const bool k_IsDataBufferUsing = false; // default subscribed data will not saved to Data buffer
+    private const bool k_isDataBufferUsing = false; // default subscribed data will not saved to Data buffer
     
     private float m_timerDataUpdate;
     
@@ -41,7 +41,7 @@ public class EmotivGameplayInterfacer : MonoBehaviour
     private void Start()
     {
         m_emotivInterface.Init(m_appConfig.ClientId, m_appConfig.ClientSecret, m_appConfig.AppName, m_appConfig.AppVersion,
-            k_IsDataBufferUsing);
+            k_isDataBufferUsing);
 
         m_emotivInterface.Start();
     }
@@ -50,10 +50,15 @@ public class EmotivGameplayInterfacer : MonoBehaviour
     {
         m_timerDataUpdate += Time.deltaTime;
 
-        if (m_timerDataUpdate - k_TimeUpdateData >= Mathf.Epsilon)
+        if (m_timerDataUpdate - k_timeUpdateData >= Mathf.Epsilon)
         {
-            m_timerDataUpdate -= k_TimeUpdateData;
-            
+            m_timerDataUpdate -= k_timeUpdateData;
+
+            if (m_emotivInterface.IsAuthorizedOK)
+            {
+                m_gameStartUIHandler.EnableCreateSessionButton();
+            }
+
             if (m_emotivInterface.IsSessionCreated)
             {
                 if (!m_isSessionCreated)

@@ -11,7 +11,6 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 [BurstCompile]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
-[UpdateAfter(typeof(FlockFlightSystem))]
 public partial struct RocketLocomotionSystem : ISystem
 {
     [BurstCompile]

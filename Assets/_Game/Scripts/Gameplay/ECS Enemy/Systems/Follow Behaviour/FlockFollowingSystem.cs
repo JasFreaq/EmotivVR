@@ -8,6 +8,7 @@ using UnityEngine;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 [BurstCompile]
+[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(FlockFlightSystem))]
 public partial struct FlockFollowingSystem : ISystem
 {

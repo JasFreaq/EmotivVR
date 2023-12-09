@@ -1412,7 +1412,10 @@ MonoBehaviour:
   - 0.5
   m_eyeLaser: {fileID: 5982778553268997730}
   m_pauseInputAction: {fileID: 0}
+  m_movementInputAction: {fileID: 5254505145543380296, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  m_laserInputAction: {fileID: -5946031776454421689, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_isPlayMode: 0
+  m_overrideControls: 0
 --- !u!114 &1229357264485917980
 MonoBehaviour:
   m_ObjectHideFlags: 0

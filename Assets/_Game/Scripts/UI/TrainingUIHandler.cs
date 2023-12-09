@@ -6,9 +6,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using DG.Tweening;
-using dirox.emotiv.controller;
-using UnityEngine.SceneManagement;
-using static Cinemachine.DocumentationSortingAttribute;
 
 public class TrainingUIHandler : MonoBehaviour
 {
@@ -34,8 +31,6 @@ public class TrainingUIHandler : MonoBehaviour
         public TrainingThresholdElement mThresholdElement;
     }
 
-    private const float k_trainingDuration = 8f;
-    
     [SerializeField] private float m_brainMapRadius = 200f;
     [SerializeField] private float m_thresholdIndicatorHalfRange = 70f;
     [SerializeField] private ActionUIElement[] m_actionUIElements;
@@ -114,7 +109,7 @@ public class TrainingUIHandler : MonoBehaviour
 
         m_cancelButton.transform.parent.gameObject.SetActive(true);
 
-        m_trainingTimeSlider.DOValue(1f, k_trainingDuration).SetEase(Ease.Linear);
+        m_trainingTimeSlider.DOValue(1f, EmotivTrainingInterfacer.k_TrainingDuration).SetEase(Ease.Linear);
         m_trainingTimeSlider.gameObject.SetActive(true);
 
         m_isTraining = true;

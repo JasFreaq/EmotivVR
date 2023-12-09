@@ -6952,7 +6952,7 @@ MonoBehaviour:
   m_bgmAudioClips:
   - {fileID: 8300000, guid: 5f7d0a60fae6da841a2ed2c1354599b5, type: 3}
   - {fileID: 8300000, guid: 8f031084522c61c4c829f60308b994d1, type: 3}
-  m_isSingleton: 0
+  m_isSingleton: 1
 --- !u!4 &1437341327
 Transform:
   m_ObjectHideFlags: 0
