@@ -39,6 +39,7 @@ public class TrainingUIHandler : MonoBehaviour
     [SerializeField] private Slider m_trainingTimeSlider;
 
     [Header("Training Buttons")]
+    [SerializeField] private Button m_createSessionButton;
     [SerializeField] private Button m_loadProfileButton;
     [SerializeField] private Button m_startButton;
     [SerializeField] private Button m_eraseButton;
@@ -77,6 +78,12 @@ public class TrainingUIHandler : MonoBehaviour
         }
     }
 
+    public void EnableCreateSessionButton()
+    {
+        if (!m_createSessionButton.interactable)
+            m_createSessionButton.interactable = true;
+    }
+    
     public void EnableLoadProfileButton()
     {
         if (!m_loadProfileButton.interactable)

@@ -96,7 +96,12 @@ public class EmotivTrainingInterfacer : MonoBehaviour
         if (m_timerDataUpdate - k_timeUpdateData >= Mathf.Epsilon)
         {
             m_timerDataUpdate -= k_timeUpdateData;
-            
+
+            if (m_emotivInterface.IsAuthorizedOK)
+            {
+                m_trainingUI.EnableCreateSessionButton();
+            }
+
             if (!m_isSessionCreated && m_emotivInterface.IsSessionCreated)
             {
                 m_emotivInterface.SubscribeData(new List<string> { "sys", "com"});
