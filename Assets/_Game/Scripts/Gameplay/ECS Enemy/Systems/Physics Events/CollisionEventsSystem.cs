@@ -11,6 +11,7 @@ using UnityEngine;
 [BurstCompile]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(PhysicsSimulationGroup))]
+[UpdateAfter(typeof(TriggerEventsSystem))]
 public partial struct CollisionEventsSystem : ISystem
 {
     [BurstCompile]

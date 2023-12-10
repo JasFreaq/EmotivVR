@@ -14,6 +14,7 @@ public partial struct ParticleSpawnerSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<ParticlesCache>();
         state.RequireForUpdate<ParticleSpawnElement>();
     }
 

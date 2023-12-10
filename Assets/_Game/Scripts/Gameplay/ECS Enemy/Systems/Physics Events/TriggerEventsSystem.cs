@@ -10,6 +10,7 @@ using UnityEngine;
 [BurstCompile]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(PhysicsSimulationGroup))]
+[UpdateBefore(typeof(CollisionEventsSystem))]
 public partial struct TriggerEventsSystem : ISystem
 {
     [BurstCompile]
