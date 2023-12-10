@@ -9,11 +9,14 @@ using UnityEngine;
 
 [BurstCompile]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
+[UpdateAfter(typeof(FlockSpawnerSystem))]
 public partial struct BirdSpawnerSystem : ISystem
 {
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<FlockSpawnerData>();
         state.RequireForUpdate<FlockProperties>();
     }
 
@@ -31,11 +34,15 @@ public partial struct BirdSpawnerSystem : ISystem
         foreach ((RefRO<FlockProperties> flockProperties, Entity flockEntity) in
                  SystemAPI.Query<RefRO<FlockProperties>>().WithEntityAccess())
         {
-            if (flockProperties.ValueRO.mFlockSpawner != null) 
+            if (flockProperties.ValueRO.mFlockSpawner != default) 
             {
                 RefRW<EnemySpawnerData> enemySpawner =
-                    SystemAPI.GetComponentRW<EnemySpawnerData>((Entity)flockProperties.ValueRO.mFlockSpawner);
-                enemySpawner.ValueRW.mSpawnedEntity ??= flockEntity;
+                    SystemAPI.GetComponentRW<EnemySpawnerData>(flockProperties.ValueRO.mFlockSpawner);
+                
+                if (enemySpawner.ValueRO.mSpawnedEntity == default)
+                {
+                    enemySpawner.ValueRW.mSpawnedEntity = flockEntity;
+                }
             }
 
             if (state.EntityManager.HasComponent<FlockSpawnData>(flockEntity)) 
@@ -61,7 +68,7 @@ public partial struct BirdSpawnerSystem : ISystem
                     };
                     commandBuffer.AddComponent(birdEntity, birdData);
                 }
-
+                
                 commandBuffer.RemoveComponent<FlockSpawnData>(flockEntity);
             }
         }

@@ -13,6 +13,7 @@ public partial struct ParticleSpawnerSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
         state.RequireForUpdate<ParticleSpawnElement>();
     }
 

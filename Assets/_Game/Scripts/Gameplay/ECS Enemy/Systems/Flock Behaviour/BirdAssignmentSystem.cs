@@ -15,6 +15,9 @@ public partial struct BirdAssignmentSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<FlockSpawnerData>();
+        state.RequireForUpdate<FlockProperties>();
         state.RequireForUpdate<BirdData>();
     }
 
@@ -32,7 +35,5 @@ public partial struct BirdAssignmentSystem : ISystem
                 birdData.ValueRW.mAssignedToFlock = true;
             }
         }
-
-        state.Enabled = false;
     }
 }

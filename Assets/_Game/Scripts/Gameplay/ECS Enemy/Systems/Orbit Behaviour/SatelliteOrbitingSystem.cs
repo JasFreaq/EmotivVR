@@ -18,6 +18,8 @@ public partial struct SatelliteOrbitingSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<PlayerCameraTransform>();
         state.RequireForUpdate<SatelliteData>();
     }
 
@@ -184,10 +186,10 @@ public partial struct SatelliteOrbitingJob : IJobEntity
 
         if (fireTimer - lastFireTime >= fireRateTime)
         {
-            float fireChance = orbitUpdate.ValueRW.mRand.NextFloat();
             int satelliteCount = orbitUpdate.ValueRO.mOrbitSatelliteCount;
+            int fireChance = orbitUpdate.ValueRW.mRand.NextInt(satelliteCount);
 
-            if (fireChance < 1f / satelliteCount)
+            if (fireChance <= 1f)
             {
                 if (mMissileSpawnBuffer.HasBuffer(mMissileCacheEntity))
                 {
@@ -198,7 +200,7 @@ public partial struct SatelliteOrbitingJob : IJobEntity
                         mMissileType = MissileType.Laser
                     });
 
-                    orbitUpdate.ValueRW.mLastFireTime = mTime;
+                    orbitUpdate.ValueRW.mLastFireTime = fireTimer;
                 }
             }
         }

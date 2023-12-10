@@ -16,8 +16,9 @@ public partial struct CollisionEventsSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<EnemyElementsCache>();
         state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<EnemyElementsCache>();
+        state.RequireForUpdate<ParticlesCache>();
         state.RequireForUpdate<SimulationSingleton>();
     }
 

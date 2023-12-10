@@ -15,7 +15,9 @@ public partial struct TriggerEventsSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerEyeLaserData>();
+        state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<EnemyElementsCache>();
+        state.RequireForUpdate<PlayerCameraTransform>();
         state.RequireForUpdate<SimulationSingleton>();
     }
 

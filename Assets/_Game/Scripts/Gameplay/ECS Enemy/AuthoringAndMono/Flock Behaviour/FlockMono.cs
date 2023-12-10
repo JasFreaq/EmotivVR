@@ -67,6 +67,7 @@ public class FlockBaker : Baker<FlockMono>
 
         AddComponent(flockEntity, new FlockProperties
         {
+            mFlockSpawner = default,
             mFlockSize = authoring.FlockSize,
             mSeparationRadius = authoring.SeparationRadius,
             mBirdSpeed = authoring.BirdSpeed,

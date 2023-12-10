@@ -16,6 +16,9 @@ public partial struct RocketLocomotionSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<EnemyElementsCache>();
+        state.RequireForUpdate<PlayerCameraTransform>();
         state.RequireForUpdate<RocketData>();
     }
 

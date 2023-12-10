@@ -5,6 +5,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
 [BurstCompile]
@@ -15,6 +16,7 @@ public partial struct OrbitSpawnerSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
         state.RequireForUpdate<OrbitSpawnerData>();
     }
 
@@ -33,15 +35,16 @@ public partial struct OrbitSpawnerSystem : ISystem
                  SystemAPI.Query<RefRO<OrbitSpawnerData>>().WithEntityAccess())
         {
             OrbitSpawnerAspect orbitSpawnerAspect = SystemAPI.GetAspect<OrbitSpawnerAspect>(orbitSpawnerEntity);
-
-            if (orbitSpawnerAspect.SpawnedEntity != null) 
+            
+            if (orbitSpawnerAspect.SpawnedEntity != default)
             {
-                Entity spawnedOrbitEntity = (Entity)orbitSpawnerAspect.SpawnedEntity;
+                Entity spawnedOrbitEntity = orbitSpawnerAspect.SpawnedEntity;
                 OrbitAspect spawnedOrbitAspect = SystemAPI.GetAspect<OrbitAspect>(spawnedOrbitEntity);
 
                 if (spawnedOrbitAspect.SatelliteCount <= 0)
                 {
                     commandBuffer.DestroyEntity(spawnedOrbitEntity);
+                    orbitSpawnerAspect.SpawnedEntity = default;
                 }
                 else
                 {

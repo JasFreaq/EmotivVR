@@ -6,7 +6,7 @@ using Random = Unity.Mathematics.Random;
 
 public struct EnemySpawnerData : IComponentData
 {
-    public Entity? mSpawnedEntity;
+    public Entity mSpawnedEntity;
 
     public Random mRandom;
 }

@@ -61,6 +61,7 @@ public class OrbitBaker : Baker<OrbitMono>
 
         AddComponent(orbitEntity, new OrbitProperties
         {
+            mOrbitSpawner = default,
             mSemiMajorAxis = authoring.SemiMajorAxis,
             mSemiMinorAxis = authoring.SemiMinorAxis,
             mOrbitThicknessBounds = authoring.OrbitThicknessBounds,

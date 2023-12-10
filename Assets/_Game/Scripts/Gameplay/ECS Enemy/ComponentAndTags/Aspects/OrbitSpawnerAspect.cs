@@ -15,7 +15,7 @@ public readonly partial struct OrbitSpawnerAspect : IAspect
 
     public Entity OrbitTransformPrefab => m_orbitSpawnerData.ValueRO.mOrbitTransformPrefab;
 
-    public Entity? SpawnedEntity
+    public Entity SpawnedEntity
     {
         get => m_enemySpawner.ValueRO.mSpawnedEntity;
         set => m_enemySpawner.ValueRW.mSpawnedEntity = value;

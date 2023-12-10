@@ -14,6 +14,8 @@ public partial struct OrbitFollowingSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<PlayerCameraTransform>();
         state.RequireForUpdate<SatelliteData>();
     }
 

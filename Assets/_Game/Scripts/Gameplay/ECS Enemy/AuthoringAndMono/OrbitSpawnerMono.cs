@@ -79,6 +79,7 @@ public class OrbitSpawnerBaker : Baker<OrbitSpawnerMono>
 
         AddComponent(orbitSpawnerEntity, new EnemySpawnerData
         {
+            mSpawnedEntity = default,
             mRandom = Random.CreateFromIndex(authoring.OrbitSpawnerRandomSeed)
         });
     }

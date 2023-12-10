@@ -14,7 +14,7 @@ public readonly partial struct FlockSpawnerAspect : IAspect
 
     public Entity FlockTransformPrefab => m_flockSpawnerData.ValueRO.mFlockTransformPrefab;
 
-    public Entity? SpawnedEntity
+    public Entity SpawnedEntity
     {
         get => m_enemySpawner.ValueRO.mSpawnedEntity;
         set => m_enemySpawner.ValueRW.mSpawnedEntity = value;

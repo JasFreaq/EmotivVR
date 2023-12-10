@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FilterSettings:
-    ExcludedBakingSystemAssemblies: []
+    ExcludedBakingSystemAssemblies:
+    - {fileID: 0}

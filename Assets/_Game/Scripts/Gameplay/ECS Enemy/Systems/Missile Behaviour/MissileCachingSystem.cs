@@ -12,6 +12,7 @@ public partial struct MissileCachingSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<EnemyElementsCache>();
         state.RequireForUpdate<MissileCacheData>();
     }
 

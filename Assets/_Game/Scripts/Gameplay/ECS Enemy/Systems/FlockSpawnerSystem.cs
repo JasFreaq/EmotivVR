@@ -5,14 +5,18 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 [BurstCompile]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
+[UpdateAfter(typeof(ShipCachingSystem))]
 public partial struct FlockSpawnerSystem : ISystem
 {
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
         state.RequireForUpdate<FlockSpawnerData>();
     }
 
@@ -31,15 +35,16 @@ public partial struct FlockSpawnerSystem : ISystem
                  SystemAPI.Query<RefRO<FlockSpawnerData>>().WithEntityAccess())
         {
             FlockSpawnerAspect flockSpawnerAspect = SystemAPI.GetAspect<FlockSpawnerAspect>(flockSpawnerEntity);
-
-            if (flockSpawnerAspect.SpawnedEntity != null)
+            
+            if (flockSpawnerAspect.SpawnedEntity != default)
             {
-                Entity spawnedFlockEntity = (Entity)flockSpawnerAspect.SpawnedEntity;
-                DynamicBuffer<FlockBirdElement> birdBuffer = SystemAPI.GetBuffer<FlockBirdElement>(spawnedFlockEntity);
-
-                if (birdBuffer.Length == 0)
+                Entity spawnedFlockEntity = flockSpawnerAspect.SpawnedEntity;
+                FlockAspect spawnedFlockAspect = SystemAPI.GetAspect<FlockAspect>(spawnedFlockEntity);
+                
+                if (spawnedFlockAspect.FlockBirdsBuffer.Length == 0)
                 {
                     commandBuffer.DestroyEntity(spawnedFlockEntity);
+                    flockSpawnerAspect.SpawnedEntity = default;
                 }
                 else
                 {
@@ -64,7 +69,7 @@ public partial struct FlockSpawnerSystem : ISystem
 
             FlockProperties flockProperties = new FlockProperties
             {
-                mFlockSpawner = flockSpawnerEntity,
+                mFlockSpawner = flockSpawnerAspect.mEntity,
                 mFlockSize = flockSpawnerAspect.GetRandomFlockSize(),
                 mSeparationRadius = flockSpawnerAspect.GetRandomSeparationRadius(),
                 mBirdSpeed = flockSpawnerAspect.GetRandomBirdSpeed(),

@@ -14,7 +14,11 @@ public readonly partial struct FlockAspect : IAspect
 
     private readonly RefRO<FlockProperties> m_flockProperties;
 
+    private readonly DynamicBuffer<FlockBirdElement> m_flockBirdsBuffer;
+
     public LocalTransform Transform => m_transform.ValueRO;
 
     public int FlockSize => m_flockProperties.ValueRO.mFlockSize;
+
+    public DynamicBuffer<FlockBirdElement> FlockBirdsBuffer => m_flockBirdsBuffer;
 }

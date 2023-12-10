@@ -183,15 +183,23 @@ public class PlayerController : MonoBehaviour
     {
         if (m_movementInputAction.action.WasPressedThisFrame())
         {
-            m_isMovementInput = !m_movementInputAction;
+            m_isMovementInput = true;
         }
-        Debug.Log(m_isMovementInput);
-        if (m_laserInputAction.action.WasPressedThisFrame())
+        else if (m_movementInputAction.action.WasReleasedThisFrame())
         {
-            m_isLaserInput = !m_isLaserInput;
-            m_isPlayerLaserInput = m_isLaserInput;
+            m_isMovementInput = false;
         }
 
+        if (m_laserInputAction.action.WasPressedThisFrame())
+        {
+            m_isLaserInput = true;
+        }
+        else if (m_laserInputAction.action.WasReleasedThisFrame())
+        {
+            m_isLaserInput = false;
+        }
+
+        m_isPlayerLaserInput = m_isLaserInput;
         if (m_isMovementInput)
         {
             EnqueueMovementInput(Random.Range(0f, 1f));

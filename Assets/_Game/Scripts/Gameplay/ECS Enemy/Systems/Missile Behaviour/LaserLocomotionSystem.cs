@@ -15,6 +15,8 @@ public partial struct LaserLocomotionSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<EnemyElementsCache>();
         state.RequireForUpdate<LaserData>();
     }
 

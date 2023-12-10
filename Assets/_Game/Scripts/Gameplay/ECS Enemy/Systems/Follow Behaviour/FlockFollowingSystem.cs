@@ -15,6 +15,8 @@ public partial struct FlockFollowingSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<PlayerCameraTransform>();
         state.RequireForUpdate<BirdData>();
     }
 

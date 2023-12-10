@@ -91,6 +91,7 @@ public class FlockSpawnerBaker : Baker<FlockSpawnerMono>
 
         AddComponent(flockSpawnerEntity, new EnemySpawnerData
         {
+            mSpawnedEntity = default,
             mRandom = Random.CreateFromIndex(authoring.FlockSpawnerRandomSeed)
         });
     }

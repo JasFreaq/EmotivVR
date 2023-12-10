@@ -7,8 +7,6 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
-using Unity.VisualScripting;
-using UnityEngine;
 
 [BurstCompile]
 [RequireMatchingQueriesForUpdate]
@@ -19,6 +17,8 @@ public partial struct FlockFlightSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<PlayerCameraTransform>();
         state.RequireForUpdate<BirdData>();
     }
     

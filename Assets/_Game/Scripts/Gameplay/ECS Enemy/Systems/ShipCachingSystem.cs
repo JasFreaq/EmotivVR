@@ -12,6 +12,7 @@ public partial struct ShipCachingSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<EnemyElementsCache>();
         state.RequireForUpdate<ShipCacheData>();
     }
 

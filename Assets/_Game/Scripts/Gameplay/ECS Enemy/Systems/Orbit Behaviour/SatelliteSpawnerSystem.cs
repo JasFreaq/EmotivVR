@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Principal;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -16,6 +15,8 @@ public partial struct SatelliteSpawnerSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
+        state.RequireForUpdate<OrbitSpawnerData>();
         state.RequireForUpdate<OrbitProperties>();
     }
     
@@ -35,11 +36,13 @@ public partial struct SatelliteSpawnerSystem : ISystem
         foreach ((RefRO<OrbitProperties> orbitProperties, Entity orbitEntity) in 
                  SystemAPI.Query<RefRO<OrbitProperties>>().WithEntityAccess())
         {
-            if (orbitProperties.ValueRO.mOrbitSpawner != null) 
+            if (orbitProperties.ValueRO.mOrbitSpawner != default) 
             {
                 RefRW<EnemySpawnerData> enemySpawner =
-                    SystemAPI.GetComponentRW<EnemySpawnerData>((Entity)orbitProperties.ValueRO.mOrbitSpawner);
-                enemySpawner.ValueRW.mSpawnedEntity ??= orbitEntity;
+                    SystemAPI.GetComponentRW<EnemySpawnerData>(orbitProperties.ValueRO.mOrbitSpawner);
+
+                if (enemySpawner.ValueRO.mSpawnedEntity == default)
+                    enemySpawner.ValueRW.mSpawnedEntity = orbitEntity;
             }
 
             if (state.EntityManager.HasComponent<OrbitSpawnData>(orbitEntity))
