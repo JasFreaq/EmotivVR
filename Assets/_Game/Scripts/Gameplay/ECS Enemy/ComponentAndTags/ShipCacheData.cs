@@ -5,6 +5,8 @@ using UnityEngine;
 
 public struct ShipCacheData : IComponentData
 {
+    public bool mAddedToBuffer;
+
     public Entity mPrefab;
 
     public ShipType mShipType;

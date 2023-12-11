@@ -1320,7 +1320,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96b49ec3675f3984dbca7d1998fe1d00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerStartingHealth: 5000
+  m_playerStartingHealth: 200
 --- !u!4 &1630682618
 Transform:
   m_ObjectHideFlags: 0

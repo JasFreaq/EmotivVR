@@ -23,27 +23,30 @@ public partial struct MissileCachingSystem : ISystem
         
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         
-        foreach((RefRO<MissileCacheData> missileCacheData, Entity missileCacheDataEntity) in 
-                SystemAPI.Query<RefRO<MissileCacheData>>().WithEntityAccess())
+        foreach((RefRW<MissileCacheData> missileCacheData, Entity missileCacheDataEntity) in 
+                SystemAPI.Query<RefRW<MissileCacheData>>().WithEntityAccess())
         {
-            switch (missileCacheData.ValueRO.mMissileType)
+            if (!missileCacheData.ValueRO.mAddedToBuffer) 
             {
-                case MissileType.Laser:
-                    DynamicBuffer<MissileLaserElement> laserBuffer = SystemAPI.GetBuffer<MissileLaserElement>(enemyElementsCacheEntity);
-                    laserBuffer.Add(missileCacheData.ValueRO.mPrefab);
-                    break;
+                switch (missileCacheData.ValueRO.mMissileType)
+                {
+                    case MissileType.Laser:
+                        DynamicBuffer<MissileLaserElement> laserBuffer =
+                            SystemAPI.GetBuffer<MissileLaserElement>(enemyElementsCacheEntity);
+                        laserBuffer.Add(missileCacheData.ValueRO.mPrefab);
+                        break;
 
-                case MissileType.Rocket:
-                    DynamicBuffer<MissileRocketElement> rocketBuffer = SystemAPI.GetBuffer<MissileRocketElement>(enemyElementsCacheEntity);
-                    rocketBuffer.Add(missileCacheData.ValueRO.mPrefab);
-                    break;
+                    case MissileType.Rocket:
+                        DynamicBuffer<MissileRocketElement> rocketBuffer =
+                            SystemAPI.GetBuffer<MissileRocketElement>(enemyElementsCacheEntity);
+                        rocketBuffer.Add(missileCacheData.ValueRO.mPrefab);
+                        break;
+                }
+
+                missileCacheData.ValueRW.mAddedToBuffer = true;
             }
-
-            commandBuffer.DestroyEntity(missileCacheDataEntity);
         }
 
         commandBuffer.Playback(state.EntityManager);
-
-        state.Enabled = false;
     }
 }

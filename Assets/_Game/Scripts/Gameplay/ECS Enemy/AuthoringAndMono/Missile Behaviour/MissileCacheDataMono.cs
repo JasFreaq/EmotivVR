@@ -23,6 +23,7 @@ public class MissileCacheDataBaker : Baker<MissileCacheDataMono>
 
         AddComponent(missileCacheDataEntity, new MissileCacheData
         {
+            mAddedToBuffer = false,
             mPrefab = GetEntity(authoring.MissilePrefab, TransformUsageFlags.Dynamic),
             mMissileType = authoring.MissileType
         });

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -23,27 +24,30 @@ public partial struct ShipCachingSystem : ISystem
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
-        foreach ((RefRO<ShipCacheData> shipCacheData, Entity shipCacheDataEntity) in
-                 SystemAPI.Query<RefRO<ShipCacheData>>().WithEntityAccess())
+        foreach ((RefRW<ShipCacheData> shipCacheData, Entity shipCacheDataEntity) in
+                 SystemAPI.Query<RefRW<ShipCacheData>>().WithEntityAccess())
         {
-            switch (shipCacheData.ValueRO.mShipType)
+            if (!shipCacheData.ValueRO.mAddedToBuffer) 
             {
-                case ShipType.Satellite:
-                    DynamicBuffer<SatellitePrefabElement> satelliteBuffer = SystemAPI.GetBuffer<SatellitePrefabElement>(enemyElementsCacheEntity);
-                    satelliteBuffer.Add(shipCacheData.ValueRO.mPrefab);
-                    break;
+                switch (shipCacheData.ValueRO.mShipType)
+                {
+                    case ShipType.Satellite:
+                        DynamicBuffer<SatellitePrefabElement> satelliteBuffer =
+                            SystemAPI.GetBuffer<SatellitePrefabElement>(enemyElementsCacheEntity);
+                        satelliteBuffer.Add(shipCacheData.ValueRO.mPrefab);
+                        break;
 
-                case ShipType.Bird:
-                    DynamicBuffer<BirdPrefabElement> birdBuffer = SystemAPI.GetBuffer<BirdPrefabElement>(enemyElementsCacheEntity);
-                    birdBuffer.Add(shipCacheData.ValueRO.mPrefab);
-                    break;
+                    case ShipType.Bird:
+                        DynamicBuffer<BirdPrefabElement> birdBuffer =
+                            SystemAPI.GetBuffer<BirdPrefabElement>(enemyElementsCacheEntity);
+                        birdBuffer.Add(shipCacheData.ValueRO.mPrefab);
+                        break;
+                }
+
+                shipCacheData.ValueRW.mAddedToBuffer = true;
             }
-
-            commandBuffer.DestroyEntity(shipCacheDataEntity);
         }
 
         commandBuffer.Playback(state.EntityManager);
-
-        state.Enabled = false;
     }
 }

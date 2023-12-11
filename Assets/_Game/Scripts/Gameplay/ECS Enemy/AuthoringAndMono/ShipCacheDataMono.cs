@@ -21,6 +21,7 @@ public class ShipCacheDataBaker : Baker<ShipCacheDataMono>
 
         AddComponent(missileCacheDataEntity, new ShipCacheData
         {
+            mAddedToBuffer = false,
             mPrefab = GetEntity(authoring.ShipPrefab, TransformUsageFlags.Dynamic),
             mShipType = authoring.ShipType
         });

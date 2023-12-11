@@ -15,9 +15,7 @@ public class GameStartUIHandler : MonoBehaviour
     public void HandleProfileLoaded()
     {
         m_fadeImage.DOColor(new Color(m_fadeImage.color.r, m_fadeImage.color.g, m_fadeImage.color.b, 0f), m_fadeInDuration)
-            .SetEase(Ease.InExpo).OnComplete(() => m_fadeImage.gameObject.SetActive(false));
-
-        gameObject.SetActive(false);
+            .SetEase(Ease.InExpo).OnComplete(() => gameObject.SetActive(false));
     }
 
     public void EnableCreateSessionButton()

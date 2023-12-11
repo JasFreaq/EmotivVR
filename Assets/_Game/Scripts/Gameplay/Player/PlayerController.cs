@@ -14,7 +14,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private InputActionReference m_movementInputAction;
     [SerializeField] private InputActionReference m_laserInputAction;
     [SerializeField] private bool m_isPlayMode;
-    [SerializeField] private bool m_overrideControls;
     
     private PlayerStateManager m_playerStateManager;
 
@@ -35,10 +34,14 @@ public class PlayerController : MonoBehaviour
     private bool m_isProfileLoaded;
     
     private bool m_isGamePaused;
+
+    private bool m_isGameOver;
+
+    private bool m_overrideControls;
+
+    private bool m_isOverrideMovementInput;
     
-    private bool m_isMovementInput;
-    
-    private bool m_isLaserInput;
+    private bool m_isOverrideLaserInput;
 
     public bool IsPlayerLaserInput
     {
@@ -64,6 +67,11 @@ public class PlayerController : MonoBehaviour
         m_flyAudioSource = GetComponent<AudioSource>();
     }
 
+    private void OnEnable()
+    {
+        m_playerStateManager.RegisterOnGameOver(GameOver);
+    }
+
     private void Start()
     {
         m_cameraTransform = Camera.main.transform;
@@ -79,6 +87,9 @@ public class PlayerController : MonoBehaviour
         if (!m_isProfileLoaded)
             return;
 
+        if (m_isGameOver)
+            return;
+
         if (m_pauseInputAction != null) 
         {
             if (m_pauseInputAction.action.WasPressedThisFrame())
@@ -88,11 +99,10 @@ public class PlayerController : MonoBehaviour
         }
 
         if (m_isGamePaused)
-        {
             return;
-        }
 
-        SimulateInput();
+        if (m_overrideControls)
+            SimulateInput();
 
         m_laserTimer += Time.deltaTime * (m_isPlayerLaserInput ? 1f : -1f);
         m_laserTimer = Mathf.Clamp(m_laserTimer, 0f, m_totalLaserTime);
@@ -139,7 +149,10 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         if (m_isGamePaused)
+        {
+            m_rigidbody.velocity = Vector3.zero;
             return;
+        }
 
         if (m_inputQueue.Count > 0)
         {
@@ -157,6 +170,11 @@ public class PlayerController : MonoBehaviour
             if (m_flyAudioSource.isPlaying)
                 m_flyAudioSource.Stop();
         }
+    }
+
+    private void OnDisable()
+    {
+        m_playerStateManager.DeregisterOnGameOver(GameOver);
     }
 
     public void EnqueueMovementInput(float input)
@@ -183,26 +201,36 @@ public class PlayerController : MonoBehaviour
     {
         if (m_movementInputAction.action.WasPressedThisFrame())
         {
-            m_isMovementInput = true;
+            m_isOverrideMovementInput = true;
         }
         else if (m_movementInputAction.action.WasReleasedThisFrame())
         {
-            m_isMovementInput = false;
+            m_isOverrideMovementInput = false;
         }
 
         if (m_laserInputAction.action.WasPressedThisFrame())
         {
-            m_isLaserInput = true;
+            m_isOverrideLaserInput = true;
         }
         else if (m_laserInputAction.action.WasReleasedThisFrame())
         {
-            m_isLaserInput = false;
+            m_isOverrideLaserInput = false;
         }
 
-        m_isPlayerLaserInput = m_isLaserInput;
-        if (m_isMovementInput)
+        m_isPlayerLaserInput = m_isOverrideLaserInput;
+        if (m_isOverrideMovementInput)
         {
             EnqueueMovementInput(Random.Range(0f, 1f));
         }
+    }
+
+    public void OverrideControls(bool state)
+    {
+        m_overrideControls = state;
+    }
+
+    private void GameOver()
+    {
+        m_isGameOver = true;
     }
 }

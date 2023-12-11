@@ -68,6 +68,7 @@ public partial struct OrbitSpawnerSystem : ISystem
             Entity enemyElementsCacheEntity = SystemAPI.GetSingletonEntity<EnemyElementsCache>();
             DynamicBuffer<SatellitePrefabElement> satellitePrefabsBuffer = SystemAPI.GetBuffer<SatellitePrefabElement>(enemyElementsCacheEntity);
             int satelliteBufferLength = satellitePrefabsBuffer.Length;
+
             Entity satellitePrefabEntity = satellitePrefabsBuffer[orbitSpawnerAspect.GetRandomIndex(satelliteBufferLength)].mSatellitePrefab;
 
             OrbitProperties orbitProperties = new OrbitProperties

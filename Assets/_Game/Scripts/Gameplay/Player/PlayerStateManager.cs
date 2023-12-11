@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerStateManager : MonoBehaviour
 {
@@ -15,6 +17,7 @@ public class PlayerStateManager : MonoBehaviour
     [SerializeField] private GameObject m_pauseMenu;
     [SerializeField] private GameObject m_gameOverMenu;
     [SerializeField] private TextMeshProUGUI m_gameOverScore;
+    [SerializeField] private GameObject[] m_pauseAffordanceObjects;
 
     private Transform m_mainCameraTransform;
 
@@ -31,6 +34,8 @@ public class PlayerStateManager : MonoBehaviour
     
     private EntityQuery m_stateQuery;
     private EntityQuery m_scoreQuery;
+
+    private Action m_onGameOver;
 
     private bool m_addedCameraDetails;
 
@@ -134,7 +139,8 @@ public class PlayerStateManager : MonoBehaviour
 
             if (playerHealth <= 0)
             {
-
+                GameOver();
+                m_onGameOver?.Invoke();
             }
         }
 
@@ -156,13 +162,33 @@ public class PlayerStateManager : MonoBehaviour
 
         if (alterMenu)
             m_pauseMenu.SetActive(m_isGamePaused);
+
+        foreach (GameObject affordanceObject in m_pauseAffordanceObjects)
+        {
+            affordanceObject.SetActive(pause);
+        }
     }
     
-    public void GameOver()
+    private void GameOver()
     {
         m_isGamePaused = true;
 
         m_gameOverScore.text = m_totalScore.ToString();
         m_gameOverMenu.SetActive(true);
+
+        foreach (GameObject affordanceObject in m_pauseAffordanceObjects)
+        {
+            affordanceObject.SetActive(true);
+        }
+    }
+
+    public void RegisterOnGameOver(Action action)
+    {
+        m_onGameOver += action;
+    }
+    
+    public void DeregisterOnGameOver(Action action)
+    {
+        m_onGameOver -= action;
     }
 }

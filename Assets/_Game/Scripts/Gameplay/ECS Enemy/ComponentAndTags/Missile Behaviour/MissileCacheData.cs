@@ -5,6 +5,8 @@ using UnityEngine;
 
 public struct MissileCacheData : IComponentData
 {
+    public bool mAddedToBuffer;
+
     public Entity mPrefab;
 
     public MissileType mMissileType;
