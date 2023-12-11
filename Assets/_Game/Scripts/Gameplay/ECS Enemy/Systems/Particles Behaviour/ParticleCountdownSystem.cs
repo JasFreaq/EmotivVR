@@ -8,7 +8,7 @@ using Unity.Transforms;
 using UnityEngine;
 
 [BurstCompile]
-[UpdateInGroup(typeof(SimulationSystemGroup))]
+[UpdateInGroup(typeof(InitializationSystemGroup))]
 public partial struct ParticleCountdownSystem : ISystem
 {
     [BurstCompile]

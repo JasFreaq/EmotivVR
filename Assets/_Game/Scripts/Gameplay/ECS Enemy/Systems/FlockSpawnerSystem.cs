@@ -108,4 +108,9 @@ public partial struct FlockSpawnerSystem : ISystem
 
         commandBuffer.Playback(state.EntityManager);
     }
+
+    public void OnDestroy(ref SystemState state)
+    {
+        throw new System.NotImplementedException();
+    }
 }

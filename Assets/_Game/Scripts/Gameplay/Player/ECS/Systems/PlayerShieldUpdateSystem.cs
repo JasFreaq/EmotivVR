@@ -12,6 +12,7 @@ public partial struct PlayerShieldUpdateSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
         state.RequireForUpdate<PlayerShieldTransform>();
     }
 

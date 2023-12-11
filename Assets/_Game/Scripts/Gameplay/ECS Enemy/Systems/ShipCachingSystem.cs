@@ -14,6 +14,8 @@ public partial struct ShipCachingSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<EnemyElementsCache>();
+        state.RequireForUpdate<SatellitePrefabElement>();
+        state.RequireForUpdate<BirdPrefabElement>();
         state.RequireForUpdate<ShipCacheData>();
     }
 

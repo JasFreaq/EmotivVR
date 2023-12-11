@@ -11,6 +11,7 @@ public partial struct PlayerUpdateSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerStateData>();
         state.RequireForUpdate<PlayerCameraTransform>();
     }
 
