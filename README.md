@@ -8,7 +8,7 @@ Welcome to my project! The objective of this undertaking is to leverage the Emot
 The project is released under the MIT license, granting you the freedom to repurpose it as you see fit (a little credit would be appreciated, as it goes a long way in supporting my work).
 
 ### Project Overview
-For a brief overview of the project, check out the [YouTube video](https://www.youtube.com/watch?v=HWJ2hlBIkfE) where I delve into its key aspects. This video provides insights into the project's goals, development process, and some exciting highlights.
+For a brief overview of the project, check out the [YouTube video](https://youtu.be/HWJ2hlBIkfE) where I delve into its key aspects. This video provides insights into the project's goals, development process, and some exciting highlights.
 
 For your convenience, a build of the project is available for download on my [itch.io](https://jasfreaq.itch.io/aliens-vs-laser-knights) page. To play the game you will need to have an Emotiv account (and a headset of course). Simply log in to the Emotiv Launcher and connect your headset. You will also need a VR headset of your choice for the game. In my experience I found that keeping the VR headset a bit loose so that it doesnt apply a lot of pressure on Emotiv's headset yields better response rates.
 
